@@ -19,17 +19,17 @@ public class GAction00 extends GAction implements PositionInterface {
 	protected double z;
 	
 	@Override
-	public void addX(double x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
 	@Override
-	public void addY(double y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 
 	@Override
-	public void addZ(double z) {
+	public void setZ(double z) {
 		this.z = z;
 	}
 

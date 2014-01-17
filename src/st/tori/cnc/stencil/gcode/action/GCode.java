@@ -1,9 +1,12 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import static org.hamcrest.CoreMatchers.*;
+
 import java.util.ArrayList;
 
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedProgramException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedUnitException;
+import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
 
 
 public class GCode extends ArrayList<ActionInterface> {
@@ -27,12 +30,21 @@ public class GCode extends ArrayList<ActionInterface> {
 	private PROG prog = PROG.UNDEF;
 	private SPINDLE spindle = SPINDLE.OFF;
 	
+	private PositionInterface lastPosition = null;
+	private SpeedInterface lastSpeed = null;
+	
+	public PositionInterface getLastPosition(){	return lastPosition;	}
+	public SpeedInterface getLastSpeed(){	return lastSpeed;	}
+	
 	protected final void isReadyToMove() throws NoSpecifiedUnitException, NoSpecifiedProgramException {
 		if(unit==UNIT.UNDEF)throw new NoSpecifiedUnitException();
 		if(prog==PROG.UNDEF)throw new NoSpecifiedProgramException();
 	}
 	protected final boolean isSpindleOn(){
 		return (spindle==SPINDLE.ON);
+	}
+	public boolean isEqual(GCode code) {
+		return false;
 	}
 	
 	@Override
@@ -50,6 +62,10 @@ public class GCode extends ArrayList<ActionInterface> {
 		}else if(action instanceof MAction30) {
 			spindle = SPINDLE.OFF;
 		}
+		if(action instanceof PositionInterface)
+			lastPosition = (PositionInterface)action;
+		if(action instanceof SpeedInterface)
+			lastSpeed = (SpeedInterface)action;
 		return super.add(action);
 	}
 	

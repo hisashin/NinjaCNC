@@ -5,8 +5,10 @@ import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
 
 public class ActionFactory {
 
-	public static GAction createGAction(int gIndex, double lastSpeed) throws InvalidIndexException {
+	public static GAction createGAction(int gIndex,ActionFactory  lastAction, double lastSpeed) throws InvalidIndexException {
 		GAction action;
+		if(gIndex<0)
+			gIndex = lastAction.getGIndex();
 		if(gIndex==0)
 			action = new GAction00();
 		else if(gIndex==1)
@@ -21,8 +23,12 @@ public class ActionFactory {
 			action = new GAction90();
 		else
 			throw new InvalidIndexException("G",gIndex);
-		if(lastSpeed>0&&action instanceof SpeedInterface)
+		if(lastAction!=null&&action instanceof PositionInterface) {
+			((PositionInterface)action).setX(lastAction);
+		}
+		if(lastSpeed>0&&action instanceof SpeedInterface) {
 			((SpeedInterface)action).setF(lastSpeed);
+		}
 		return action;
 	}
 	

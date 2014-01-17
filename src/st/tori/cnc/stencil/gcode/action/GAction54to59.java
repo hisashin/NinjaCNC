@@ -16,6 +16,7 @@ public class GAction54to59 extends GAction {
 		this.gIndex = gIndex;
 	}
 	
-	protected int getGIndex(){	return gIndex;	}
+	public int getGIndex() {	return gIndex;	}
+
 
 }
