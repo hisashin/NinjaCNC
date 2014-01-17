@@ -1,4 +1,4 @@
-package st.tori.cnc.stencil.parser;
+package st.tori.cnc.stencil.gerber.parser;
 
 import java.io.BufferedReader;
 import java.io.File;
