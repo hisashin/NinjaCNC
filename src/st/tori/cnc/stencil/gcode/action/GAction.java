@@ -12,11 +12,11 @@ public abstract class GAction implements ActionInterface {
 	}
 	protected void inherit(GCode gCode) {
 		if(gCode==null)return;
-		PositionInterface lastPosition = gCode.getLastPosition();
-		if(lastPosition != null && this instanceof PositionInterface) {
-			((PositionInterface)this).setX(lastPosition.getX());
-			((PositionInterface)this).setY(lastPosition.getY());
-			((PositionInterface)this).setZ(lastPosition.getZ());
+		PositionXYZInterface lastPosition = gCode.getLastPosition();
+		if(lastPosition != null && this instanceof PositionXYZInterface) {
+			((PositionXYZInterface)this).setX(lastPosition.getX());
+			((PositionXYZInterface)this).setY(lastPosition.getY());
+			((PositionXYZInterface)this).setZ(lastPosition.getZ());
 		}
 		SpeedInterface lastSpeed = gCode.getLastSpeed();
 		if(lastSpeed != null && this instanceof SpeedInterface) {

@@ -1,13 +1,11 @@
 package st.tori.cnc.stencil.gcode.action;
 
-public interface PositionInterface {
+public interface PositionXYInterface {
 
 	void setX(double x);
 	void setY(double y);
-	void setZ(double z);
 	
 	double getX();
 	double getY();
-	double getZ();
 	
 }

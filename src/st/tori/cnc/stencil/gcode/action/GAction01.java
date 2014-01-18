@@ -16,7 +16,7 @@ import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
 	Thus the actual toolpath of the machining takes place with the given feedrate 
 	on a path that is accurately linear to within very small limits.
  */
-public class GAction01 extends GAction implements PositionInterface,SpeedInterface {
+public class GAction01 extends GAction implements PositionXYZInterface,SpeedInterface {
 
 	@Override
 	protected int getGIndex() {	return 1;	}

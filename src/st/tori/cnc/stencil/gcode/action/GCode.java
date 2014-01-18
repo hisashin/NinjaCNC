@@ -2,42 +2,53 @@ package st.tori.cnc.stencil.gcode.action;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import st.tori.cnc.stencil.canvas.shape.Drawable;
+import st.tori.cnc.stencil.canvas.shape.Polygon;
+import st.tori.cnc.stencil.canvas.shape.SimpleXY;
+import st.tori.cnc.stencil.gcode.drill.DrillInterface;
 import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedProgramException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedUnitException;
 import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
-import st.tori.cnc.stencil.gcode.shape.ShapePolygon;
 import st.tori.cnc.stencil.util.NumberUtil;
 
 
-public class GCode extends ArrayList<ActionInterface> {
+
+public class GCode extends ArrayList<ActionInterface> implements Drawable {
 
 	private boolean initialized = false;
 	private boolean finalized = false;
 	
+	private DrillInterface drill;
 	private double initialAirCutHeight = Double.MAX_VALUE;
 	private double airCutHeight = Double.MAX_VALUE;
 	private double cutHeight = Double.MAX_VALUE;
 	private double downSpeed = 0;
 	private double cutSpeed = 0;
 	
+	public DrillInterface getDrill(){	return drill;	}
 	public double getAirCutHeight(){	return airCutHeight;	}
 	public double getCutHeight(){	return cutHeight;	}
 	public double getDownSpeed(){	return downSpeed;	}
 	public double getCutSpeed(){	return cutSpeed;	}
 	
-	public final void initialize(double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
-		initialize(UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
+	public final void initialize(DrillInterface drill, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
+		initialize(drill, UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
 	}
-	public final void initialize(UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
+	public final void initialize(DrillInterface drill, UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
 		initialized = true;
+		this.drill = drill;
 		this.initialAirCutHeight = initialAirCutHeight;
 		this.airCutHeight = airCutHeight;
 		this.cutHeight = cutHeight;
 		this.downSpeed = downSpeed;
 		this.cutSpeed = cutSpeed;
+		
+		double diameter = drill.getDiameter(-cutHeight);
+		System.out.println("Diameter at Z="+cutHeight+"mm is "+NumberUtil.toGCodeValue(diameter)+"mm(radius "+NumberUtil.toGCodeValue(diameter/2)+"mm)");
 		
 		add(new Comment("Header"));
 		if(unit==UNIT.MM)
@@ -90,7 +101,7 @@ public class GCode extends ArrayList<ActionInterface> {
 		Iterator<ActionInterface> ite = super.iterator();
 		boolean zChanged = false;
 		GAction lastAction = null;
-		PositionInterface lastPosition = null;
+		PositionXYZInterface lastPosition = null;
 		SpeedInterface lastSpeed = null;
 		while(ite.hasNext()) {
 			ActionInterface action = ite.next();
@@ -104,9 +115,9 @@ public class GCode extends ArrayList<ActionInterface> {
 				}else if(zChanged) {
 					//Write G just after Z changed
 					buf.append(action.getSimpleName());
-				}else if(gAction instanceof PositionInterface 
+				}else if(gAction instanceof PositionXYZInterface 
 						&& lastPosition != null 
-						&& ((PositionInterface)gAction).getZ() != lastPosition.getZ()) {
+						&& ((PositionXYZInterface)gAction).getZ() != lastPosition.getZ()) {
 					//Skip G if Z unchanged
 					buf.append(action.getSimpleName());
 				}
@@ -114,8 +125,8 @@ public class GCode extends ArrayList<ActionInterface> {
 			}else{
 				buf.append(action.getSimpleName());
 			}
-			if(action instanceof PositionInterface) {
-				PositionInterface position = (PositionInterface)action;
+			if(action instanceof PositionXYZInterface) {
+				PositionXYZInterface position = (PositionXYZInterface)action;
 				zChanged = false;
 				if(lastPosition==null||lastPosition.getZ()!=position.getZ()) {
 					buf.append("Z").append(NumberUtil.toGCodeValue(position.getZ()));
@@ -160,11 +171,11 @@ public class GCode extends ArrayList<ActionInterface> {
 	private SPINDLE spindle = SPINDLE.OFF;
 	
 	private GAction lastAction = null;
-	private PositionInterface lastPosition = null;
+	private PositionXYZInterface lastPosition = null;
 	private SpeedInterface lastSpeed = null;
 	
 	public GAction getLastAction(){	return lastAction;	}
-	public PositionInterface getLastPosition(){	return lastPosition;	}
+	public PositionXYZInterface getLastPosition(){	return lastPosition;	}
 	public SpeedInterface getLastSpeed(){	return lastSpeed;	}
 	
 	public GAction cloneLastAction() throws NoLastActionExistsException, IllegalReflectionException {
@@ -206,20 +217,47 @@ public class GCode extends ArrayList<ActionInterface> {
 		}
 		if(action instanceof GAction)
 			lastAction = (GAction)action;
-		if(action instanceof PositionInterface)
-			lastPosition = (PositionInterface)action;
+		if(action instanceof PositionXYZInterface)
+			lastPosition = (PositionXYZInterface)action;
 		if(action instanceof SpeedInterface)
 			lastSpeed = (SpeedInterface)action;
 		return super.add(action);
 	}
 	
-	public final boolean add(ShapePolygon polygon) {
-		double[][] array = polygon.getArray();
+	private List<Drawable> drawables = new ArrayList<Drawable>();
+	
+	@Override
+	public PositionXYInterface[] getXYMinMax() {
+		if(drawables.size()<=0)return null;
+		PositionXYInterface minX = null;
+		PositionXYInterface minY = null;
+		PositionXYInterface maxX = null;
+		PositionXYInterface maxY = null;
+		for(int i=0;i<drawables.size();i++) {
+			PositionXYInterface[] xyMinMax = drawables.get(i).getXYMinMax();
+			if(xyMinMax==null)continue;
+			if(minX==null||xyMinMax[0].getX()<minX.getX())minX = xyMinMax[0];
+			if(minY==null||xyMinMax[0].getY()<minY.getY())minY = xyMinMax[0];
+			if(maxX==null||xyMinMax[1].getX()>maxX.getX())maxX = xyMinMax[1];
+			if(maxY==null||xyMinMax[1].getY()>maxY.getY())maxY = xyMinMax[1];
+		}
+		if(minX==null||minY==null||maxX==null||maxY==null)return null;
+		return new PositionXYInterface[]{
+			new SimpleXY(minX.getX(), minY.getY()),
+			new SimpleXY(maxX.getX(), maxY.getY()),
+		};
+	}
+	
+	public final boolean add(Drawable drawable) {
+		return drawables.add(drawable);
+	}
+	public final boolean add(Polygon polygon) {
+		PositionXYInterface[] array = polygon.getXYArray();
 		{
 			GAction00 action = new GAction00(this);
 			action.setZ(getAirCutHeight());
-			action.setX(array[0][0]);
-			action.setY(array[0][1]);
+			action.setX(array[0].getX());
+			action.setY(array[0].getY());
 			add(action);
 		}
 		{
@@ -230,8 +268,8 @@ public class GCode extends ArrayList<ActionInterface> {
 		}
 		for (int i = 1; i < array.length; i++) {
 			GAction01 action = new GAction01(this);
-			action.setX(array[i][0]);
-			action.setY(array[i][1]);
+			action.setX(array[i].getX());
+			action.setY(array[i].getY());
 			action.setZ(getCutHeight());
 			action.setF(getCutSpeed());
 			add(action);
@@ -241,7 +279,7 @@ public class GCode extends ArrayList<ActionInterface> {
 			action.setZ(getAirCutHeight());
 			add(action);
 		}
-		return true;
+		return drawables.add(polygon);
 	}
 	
 }

@@ -12,7 +12,7 @@ package st.tori.cnc.stencil.gcode.action;
 	to avoid a crash. Some machines offer interpolated rapids as a feature for ease of programming
 	(safe to assume a straight line).
  */
-public class GAction00 extends GAction implements PositionInterface {
+public class GAction00 extends GAction implements PositionXYZInterface {
 
 	@Override
 	protected int getGIndex() {	return 0;	}
