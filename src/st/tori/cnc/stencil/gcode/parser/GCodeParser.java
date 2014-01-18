@@ -1,17 +1,12 @@
 package st.tori.cnc.stencil.gcode.parser;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import st.tori.cnc.stencil.gcode.action.ActionFactory;
-import st.tori.cnc.stencil.gcode.action.ActionInterface;
 import st.tori.cnc.stencil.gcode.action.GAction;
 import st.tori.cnc.stencil.gcode.action.GCode;
 import st.tori.cnc.stencil.gcode.action.PositionXYZInterface;

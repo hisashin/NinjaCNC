@@ -9,6 +9,8 @@ import org.junit.Test;
 import st.tori.cnc.stencil.canvas.shape.Square;
 import st.tori.cnc.stencil.gcode.action.GCode;
 import st.tori.cnc.stencil.gcode.drill.DrillOriminVC;
+import st.tori.cnc.stencil.gcode.exception.GCodeException;
+import st.tori.cnc.stencil.gcode.parser.GCodeParser;
 import st.tori.cnc.stencil.util.FileUtil;
 
 public class TestGCode {
@@ -72,6 +74,18 @@ public class TestGCode {
 	public void testSimpleStencilWithSquareFromFile() {
 		assertGCode(FileUtil.readFileAsString(new File("gerber/levistone_tcream.ncd")),
 				new GCodeSampleLevistoneTCream());
+	}
+	@Test
+	public void testParser() {
+		try {
+			File file = new File("gerber/levistone_tcream.ncd");
+			GCodeParser gcParser = new GCodeParser();
+			GCode codeNcd = gcParser.parse(file);
+			assertGCode(FileUtil.readFileAsString(file), codeNcd);
+		} catch (GCodeException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 	}
 
 }

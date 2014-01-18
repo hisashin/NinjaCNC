@@ -105,15 +105,21 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		SpeedInterface lastSpeed = null;
 		while(ite.hasNext()) {
 			ActionInterface action = ite.next();
-			if(buf.length()>0 && (!(action instanceof GAction) || !((GAction)action).isFundamental()))
+			if(buf.length()>0 
+				&& (!(action instanceof GAction) 
+						|| (!((GAction)action).isFundamental())) 
+						|| (lastAction!=null&&!lastAction.isFundamental()))
 				buf.append(RET);
 			if(action instanceof GAction) {
 				GAction gAction = (GAction)action;
 				if(lastAction == null || lastAction.getGIndex() != gAction.getGIndex()) {
 					//Write G when gIndex changed
 					buf.append(action.getSimpleName());
-				}else if(zChanged) {
-					//Write G just after Z changed
+				}else if(zChanged
+						&& lastPosition !=null
+						&& (((PositionXYZInterface)gAction).getX() != lastPosition.getX()
+							||((PositionXYZInterface)gAction).getY() != lastPosition.getY())) {
+					//Write G just after Z changed and XY will change
 					buf.append(action.getSimpleName());
 				}else if(gAction instanceof PositionXYZInterface 
 						&& lastPosition != null 
@@ -133,8 +139,9 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 					zChanged = true;
 				}
 				if(lastPosition==null||lastPosition.getX()!=position.getX()||lastPosition.getY()!=position.getY()) {
-					if(zChanged)
+					if(zChanged) {
 						buf.append(RET).append(action.getSimpleName());
+					}
 					buf.append("X").append(NumberUtil.toGCodeValue(position.getX()));
 					buf.append("Y").append(NumberUtil.toGCodeValue(position.getY()));
 				}
@@ -148,7 +155,8 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 			}
 		}
 		buf.append(RET);
-		return buf.toString();
+		//Remove ret+ret which inserts around first Z-XY positioning
+		return buf.toString().replaceAll(RET+RET+"?", RET);
 	}
 	
 	public enum UNIT {
