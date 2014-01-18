@@ -6,4 +6,8 @@ public interface PositionInterface {
 	void setY(double y);
 	void setZ(double z);
 	
+	double getX();
+	double getY();
+	double getZ();
+	
 }

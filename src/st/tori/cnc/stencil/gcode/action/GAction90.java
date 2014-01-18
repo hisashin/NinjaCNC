@@ -13,5 +13,14 @@ package st.tori.cnc.stencil.gcode.action;
 	On these lathes, G90 is instead a fixed cycle address for roughing.
  */
 public class GAction90 extends GAction {
+	
+	@Override
+	protected int getGIndex() {	return 90;	}
+	@Override
+	public boolean isFundamental() {	return true;	}
+
+	public GAction90(GCode gCode) {
+		super(gCode);
+	}
 
 }

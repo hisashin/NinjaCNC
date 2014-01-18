@@ -10,13 +10,17 @@ package st.tori.cnc.stencil.gcode.action;
  */
 public class GAction54to59 extends GAction {
 
-	protected int gIndex;
+	@Override
+	protected int getGIndex() {	return 0;	}
+
+	public GAction54to59(GCode gCode) {
+		super(gCode);
+	}
+
+	protected int gIndex = -1;
 	
-	public GAction54to59(int gIndex) {
+	public void setGIndex(int gIndex) {
 		this.gIndex = gIndex;
 	}
-	
-	public int getGIndex() {	return gIndex;	}
-
 
 }

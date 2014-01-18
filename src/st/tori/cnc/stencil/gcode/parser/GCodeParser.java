@@ -14,7 +14,9 @@ import st.tori.cnc.stencil.gcode.action.ActionInterface;
 import st.tori.cnc.stencil.gcode.action.GAction;
 import st.tori.cnc.stencil.gcode.action.GCode;
 import st.tori.cnc.stencil.gcode.action.PositionInterface;
+import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gcode.exception.InvalidIndexException;
+import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
 import st.tori.cnc.stencil.gcode.exception.PositionNotSupportedException;
 import st.tori.cnc.stencil.gcode.exception.SpeedNotSupportedException;
 import st.tori.cnc.stencil.gcode.exception.UnsupportedPrefixException;
@@ -23,10 +25,8 @@ public class GCodeParser {
 
 	private static final Pattern PATTERN = Pattern.compile("([A-Z])([\\.\\-0-9]+)");
 
-	public GCode parse(File file) throws UnsupportedPrefixException, InvalidIndexException, PositionNotSupportedException, SpeedNotSupportedException {
+	public GCode parse(File file) throws UnsupportedPrefixException, InvalidIndexException, PositionNotSupportedException, SpeedNotSupportedException, NoLastActionExistsException, IllegalReflectionException {
 		GCode gCode = new GCode();
-		PositionInterface lastPosition = null;
-		SpeedInterface lastSpeed = null;
 		GAction action = null;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -47,30 +47,29 @@ public class GCodeParser {
 						if(action!=null){
 							gCode.add(action);
 						}
-						action = ActionFactory.createGAction((int)val,lastAction,lastSpeed);
+						action = ActionFactory.createGAction((int)val,gCode);
 					}else if("M".equals(prefix)) {
 						gCode.add(ActionFactory.createMAction((int)val));
 					}else if("X".equals(prefix)) {
-						if(action==null)action = ActionFactory.createGAction(-1,lastAction,lastSpeed);
+						if(action==null)action = ActionFactory.createGAction(-1,gCode);
 						if(action instanceof PositionInterface)
 							((PositionInterface)action).setX(val);
 						else
 							throw new PositionNotSupportedException(line);
 					}else if("Y".equals(prefix)) {
-						if(action==null)action = ActionFactory.createGAction(-1,lastAction,lastSpeed);
+						if(action==null)action = ActionFactory.createGAction(-1,gCode);
 						if(action instanceof PositionInterface)
 							((PositionInterface)action).setY(val);
 						else
 							throw new PositionNotSupportedException(line);
 					}else if("Z".equals(prefix)) {
-						if(action==null)action = ActionFactory.createGAction(-1,lastAction,lastSpeed);
+						if(action==null)action = ActionFactory.createGAction(-1,gCode);
 						if(action instanceof PositionInterface)
 							((PositionInterface)action).setZ(val);
 						else
 							throw new PositionNotSupportedException(line);
 					}else if("F".equals(prefix)) {
-						if(action==null)action = ActionFactory.createGAction(-1,lastAction,lastSpeed);
-						lastSpeed = val;
+						if(action==null)action = ActionFactory.createGAction(-1,gCode);
 						if(action instanceof SpeedInterface)
 							((SpeedInterface)action).setF(val);
 						else
@@ -79,10 +78,7 @@ public class GCodeParser {
 						throw new UnsupportedPrefixException(prefix);
 					}
 				}
-				if(action!=null) {
-					gCode.add(action);
-					lastAction = action;
-				}
+				if(action!=null)gCode.add(action);
 				action = null;
 				lineCount++;
 			}

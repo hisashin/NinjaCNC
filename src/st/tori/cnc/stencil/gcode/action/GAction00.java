@@ -14,6 +14,13 @@ package st.tori.cnc.stencil.gcode.action;
  */
 public class GAction00 extends GAction implements PositionInterface {
 
+	@Override
+	protected int getGIndex() {	return 0;	}
+
+	public GAction00(GCode gCode) {
+		super(gCode);
+	}
+	
 	protected double x;
 	protected double y;
 	protected double z;
@@ -32,5 +39,12 @@ public class GAction00 extends GAction implements PositionInterface {
 	public void setZ(double z) {
 		this.z = z;
 	}
+
+	@Override
+	public double getX(){	return x;	}
+	@Override
+	public double getY(){	return y;	}
+	@Override
+	public double getZ(){	return z;	}
 
 }

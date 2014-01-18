@@ -16,4 +16,7 @@ package st.tori.cnc.stencil.gcode.action;
  */
 public class MAction03 extends MAction {
 
+	@Override
+	protected int getMIndex() {	return 3;	}
+
 }

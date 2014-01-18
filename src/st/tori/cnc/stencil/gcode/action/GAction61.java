@@ -8,4 +8,13 @@ package st.tori.cnc.stencil.gcode.action;
  */
 public class GAction61 extends GAction {
 
+	@Override
+	protected int getGIndex() {	return 61;	}
+	@Override
+	public boolean isFundamental() {	return true;	}
+
+	public GAction61(GCode gCode) {
+		super(gCode);
+	}
+
 }

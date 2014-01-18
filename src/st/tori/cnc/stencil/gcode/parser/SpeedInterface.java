@@ -4,4 +4,6 @@ public interface SpeedInterface {
 
 	void setF(double f);
 	
+	double getF();
+	
 }

@@ -18,23 +18,29 @@ import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
  */
 public class GAction01 extends GAction implements PositionInterface,SpeedInterface {
 
+	@Override
+	protected int getGIndex() {	return 1;	}
+
+	public GAction01(GCode gCode) {
+		super(gCode);
+	}
 	protected double x;
 	protected double y;
 	protected double z;
 	protected double f;
 	
 	@Override
-	public void addX(double x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
 	@Override
-	public void addY(double y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 
 	@Override
-	public void addZ(double z) {
+	public void setZ(double z) {
 		this.z = z;
 	}
 
@@ -43,4 +49,13 @@ public class GAction01 extends GAction implements PositionInterface,SpeedInterfa
 		this.f = f;
 	}
 
+
+	@Override
+	public double getX(){	return x;	}
+	@Override
+	public double getY(){	return y;	}
+	@Override
+	public double getZ(){	return z;	}
+	@Override
+	public double getF(){	return f;	}
 }
