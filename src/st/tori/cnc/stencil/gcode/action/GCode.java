@@ -8,6 +8,7 @@ import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedProgramException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedUnitException;
 import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
+import st.tori.cnc.stencil.gcode.shape.ShapePolygon;
 import st.tori.cnc.stencil.util.NumberUtil;
 
 
@@ -18,15 +19,26 @@ public class GCode extends ArrayList<ActionInterface> {
 	
 	private double initialAirCutHeight = Double.MAX_VALUE;
 	private double airCutHeight = Double.MAX_VALUE;
-	public double getAirCutHeight(){	return airCutHeight;	}
+	private double cutHeight = Double.MAX_VALUE;
+	private double downSpeed = 0;
+	private double cutSpeed = 0;
 	
-	public final void initialize(double initialAirCutHeight , double airCutHeight) {
-		initialize(UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight);
+	public double getAirCutHeight(){	return airCutHeight;	}
+	public double getCutHeight(){	return cutHeight;	}
+	public double getDownSpeed(){	return downSpeed;	}
+	public double getCutSpeed(){	return cutSpeed;	}
+	
+	public final void initialize(double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
+		initialize(UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
 	}
-	public final void initialize(UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight) {
+	public final void initialize(UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
 		initialized = true;
 		this.initialAirCutHeight = initialAirCutHeight;
 		this.airCutHeight = airCutHeight;
+		this.cutHeight = cutHeight;
+		this.downSpeed = downSpeed;
+		this.cutSpeed = cutSpeed;
+		
 		add(new Comment("Header"));
 		if(unit==UNIT.MM)
 			add(new GAction21(this));
@@ -76,9 +88,8 @@ public class GCode extends ArrayList<ActionInterface> {
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		Iterator<ActionInterface> ite = super.iterator();
-		boolean zInitialized = false;
+		boolean zChanged = false;
 		GAction lastAction = null;
-		boolean zChanged = true;
 		PositionInterface lastPosition = null;
 		SpeedInterface lastSpeed = null;
 		while(ite.hasNext()) {
@@ -93,7 +104,6 @@ public class GCode extends ArrayList<ActionInterface> {
 				}else if(zChanged) {
 					//Write G just after Z changed
 					buf.append(action.getSimpleName());
-					zChanged = false;
 				}else if(gAction instanceof PositionInterface 
 						&& lastPosition != null 
 						&& ((PositionInterface)gAction).getZ() != lastPosition.getZ()) {
@@ -106,26 +116,16 @@ public class GCode extends ArrayList<ActionInterface> {
 			}
 			if(action instanceof PositionInterface) {
 				PositionInterface position = (PositionInterface)action;
-				if(!zInitialized) {
-					if(lastPosition==null||lastPosition.getZ()!=position.getZ()) {
-						buf.append("Z").append(NumberUtil.toGCodeValue(position.getZ())).append(RET);
-						buf.append(action.getSimpleName());
-						zChanged = true;
-					}
-					if(lastPosition==null||lastPosition.getX()!=position.getX()||lastPosition.getY()!=position.getY()) {
-						buf.append("X").append(NumberUtil.toGCodeValue(position.getX()));
-						buf.append("Y").append(NumberUtil.toGCodeValue(position.getY()));
-					}
-					//zInitialized = true;
-				}else{
-					if(lastPosition==null||lastPosition.getX()!=position.getX()||lastPosition.getY()!=position.getY()) {
-						buf.append("X").append(NumberUtil.toGCodeValue(position.getX()));
-						buf.append("Y").append(NumberUtil.toGCodeValue(position.getY()));
-					}
-					if(lastPosition==null||lastPosition.getZ()!=position.getZ()) {
-						buf.append("Z").append(NumberUtil.toGCodeValue(position.getZ()));
-						zChanged = true;
-					}
+				zChanged = false;
+				if(lastPosition==null||lastPosition.getZ()!=position.getZ()) {
+					buf.append("Z").append(NumberUtil.toGCodeValue(position.getZ()));
+					zChanged = true;
+				}
+				if(lastPosition==null||lastPosition.getX()!=position.getX()||lastPosition.getY()!=position.getY()) {
+					if(zChanged)
+						buf.append(RET).append(action.getSimpleName());
+					buf.append("X").append(NumberUtil.toGCodeValue(position.getX()));
+					buf.append("Y").append(NumberUtil.toGCodeValue(position.getY()));
 				}
 				lastPosition = position;
 			}
@@ -211,6 +211,37 @@ public class GCode extends ArrayList<ActionInterface> {
 		if(action instanceof SpeedInterface)
 			lastSpeed = (SpeedInterface)action;
 		return super.add(action);
+	}
+	
+	public final boolean add(ShapePolygon polygon) {
+		double[][] array = polygon.getArray();
+		{
+			GAction00 action = new GAction00(this);
+			action.setZ(getAirCutHeight());
+			action.setX(array[0][0]);
+			action.setY(array[0][1]);
+			add(action);
+		}
+		{
+			GAction01 action = new GAction01(this);
+			action.setZ(getCutHeight());
+			action.setF(getDownSpeed());
+			add(action);
+		}
+		for (int i = 1; i < array.length; i++) {
+			GAction01 action = new GAction01(this);
+			action.setX(array[i][0]);
+			action.setY(array[i][1]);
+			action.setZ(getCutHeight());
+			action.setF(getCutSpeed());
+			add(action);
+		}
+		{
+			GAction00 action = new GAction00(this);
+			action.setZ(getAirCutHeight());
+			add(action);
+		}
+		return true;
 	}
 	
 }

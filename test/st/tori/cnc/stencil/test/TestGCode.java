@@ -4,9 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import st.tori.cnc.stencil.gcode.action.GAction00;
-import st.tori.cnc.stencil.gcode.action.GAction01;
 import st.tori.cnc.stencil.gcode.action.GCode;
+import st.tori.cnc.stencil.gcode.shape.ShapeSquare;
 
 public class TestGCode {
 
@@ -32,28 +31,16 @@ public class TestGCode {
 		buf.append("G00Z0.500").append(RET);
 		TEST_HEADER = buf.toString();
 	}
-	@Test
-	public void testHeader() {
-		GCode code = new GCode();
-		code.initialize(5.0, 0.5);
-		assertGCode(TEST_HEADER, code);
-	}
 	private static String TEST_FOOTER;
 	static{
 		StringBuffer buf = new StringBuffer();
 		buf.append("(Footer)").append(RET);
 		buf.append("G61").append(RET);
 		buf.append("G00Z5.000").append(RET);
-		buf.append("G00X0.000Y00.000").append(RET);
+		//buf.append("G00X0.000Y00.000").append(RET);
+		buf.append("G00X0.000Y0.000").append(RET);
 		buf.append("M30").append(RET);
 		TEST_FOOTER = buf.toString();
-	}
-	@Test
-	public void testFooter() {
-		GCode code = new GCode();
-		code.initialize(5.0, 0.5);
-		code.finalize();
-		assertGCode(TEST_HEADER+TEST_FOOTER, code);
 	}
 	private static String TEST_SQUARE_CUT;
 	static{
@@ -68,63 +55,14 @@ public class TestGCode {
 		buf.append("G00 Z0.500").append(RET);
 		TEST_SQUARE_CUT = buf.toString();
 	}
-	@Test
-	public void testSquareCut() {
-		GCode code = new GCode();
-		code.initialize(5, 0.5);
-		{
-			GAction00 action = new GAction00(code);
-			action.setX(-0.1);
-			action.setY(-0.1);
-			action.setZ(0.5);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setZ(-0.15);
-			action.setF(100);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(1.37);
-			action.setY(-0.1);
-			action.setF(300);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(1.37);
-			action.setY(1.37);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(-0.1);
-			action.setY(1.37);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(-0.1);
-			action.setY(-0.1);
-			code.add(action);
-		}
-		{
-			GAction00 action = new GAction00(code);
-			action.setZ(0.5);
-			code.add(action);
-		}
-		code.finalize();
-		assertGCode(TEST_HEADER+TEST_SQUARE_CUT+TEST_FOOTER, code);
-	}
-	@Test
-	public void testWholeStencil() {
+	private static String TEST_SIMPLE_STENCIL;
+	static{
 		StringBuffer buf = new StringBuffer();
 		buf.append("(Header)").append(RET);
 		buf.append("G21G61G90").append(RET);
 		buf.append("G00Z5.000").append(RET);
-		buf.append("G00X0.000Y00.000").append(RET);
+		//buf.append("G00X0.000Y00.000").append(RET);
+		buf.append("G00X0.000Y0.000").append(RET);
 		buf.append("M03").append(RET);
 		buf.append("G00Z0.500").append(RET);
 		buf.append("G00 X-0.100 Y-0.100").append(RET);
@@ -424,53 +362,68 @@ public class TestGCode {
 		buf.append("(Footer)").append(RET);
 		buf.append("G61").append(RET);
 		buf.append("G00Z5.000").append(RET);
-		buf.append("G00X0.000Y00.000").append(RET);
+		//buf.append("G00X0.000Y00.000").append(RET);
+		buf.append("G00X0.000Y0.000").append(RET);
 		buf.append("M30").append(RET);		
+		TEST_SIMPLE_STENCIL = buf.toString();
+	}
+	
+	@Test
+	public void testSquareCut() {
 		GCode code = new GCode();
-		{
-			GAction00 action = new GAction00(code);
-			action.setX(-0.1);
-			action.setY(-0.1);
-			action.setZ(0.5);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setZ(-0.15);
-			action.setF(100);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(1.37);
-			action.setY(-0.1);
-			action.setF(300);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(1.37);
-			action.setY(1.37);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(-0.1);
-			action.setY(1.37);
-			code.add(action);
-		}
-		{
-			GAction01 action = new GAction01(code);
-			action.setX(-0.1);
-			action.setY(-0.1);
-			code.add(action);
-		}
-		{
-			GAction00 action = new GAction00(code);
-			action.setZ(0.5);
-			code.add(action);
-		}
-		assertGCode(buf.toString(), code);
+		code.initialize(5.0, 0.5, -0.15, 100.0, 300.0);
+		code.add(new ShapeSquare(-0.1, -0.1, 1.37, 1.37));
+		code.finalize();
+		assertGCode(TEST_HEADER+TEST_SQUARE_CUT+TEST_FOOTER, code);
+	}
+	@Test
+	public void testSimpleStencil() {
+		GCode code = new GCode();
+		code.initialize(5.0, 0.5, -0.15, 100.0, 300.0);
+		code.add(new ShapeSquare(-0.1, -0.1, 1.37, 1.37));
+		code.add(new ShapeSquare(2.735, -0.1, 3.935, 1.37));
+		code.add(new ShapeSquare(5.3, -0.1, 6.77, 1.37));
+		code.add(new ShapeSquare(8.735, 3.185, 9.436, 4.186));
+		code.add(new ShapeSquare(8.735, 4.687, 9.436, 5.687));
+		code.add(new ShapeSquare(10.237, 4.687, 10.937, 5.687));
+		code.add(new ShapeSquare(10.237, 3.185, 10.937, 4.186));
+		code.add(new ShapeSquare(10.237, 7.186, 10.937, 8.186));
+		code.add(new ShapeSquare(8.735, 7.186, 9.436, 8.186));
+		code.add(new ShapeSquare(7.237, 7.186, 7.937, 8.186));
+		code.add(new ShapeSquare(5.736, 7.186, 6.436, 8.186));
+		code.add(new ShapeSquare(5.296, 8.697, 5.997, 10.398));
+		code.add(new ShapeSquare(6.294, 8.697, 6.995, 10.398));
+		code.add(new ShapeSquare(7.295, 8.697, 7.996, 10.398));
+		code.add(new ShapeSquare(8.296, 8.697, 8.996, 10.398));
+		code.add(new ShapeSquare(9.297, 8.697, 9.997, 10.398));
+		code.add(new ShapeSquare(10.595, 9.871, 12.296, 10.571));
+		code.add(new ShapeSquare(10.595, 10.872, 12.296, 11.572));
+		code.add(new ShapeSquare(10.595, 11.872, 12.296, 12.573));
+		code.add(new ShapeSquare(10.595, 12.873, 12.296, 13.573));
+		code.add(new ShapeSquare(10.595, 13.871, 12.296, 14.572));
+		code.add(new ShapeSquare(10.595, 14.872, 12.296, 15.572));
+		code.add(new ShapeSquare(9.297, 15.047, 9.997, 16.748));
+		code.add(new ShapeSquare(8.296, 15.047, 8.996, 16.748));
+		code.add(new ShapeSquare(7.295, 15.047, 7.996, 16.748));
+		code.add(new ShapeSquare(6.294, 15.047, 6.995, 16.748));
+		code.add(new ShapeSquare(5.296, 15.047, 5.997, 16.748));
+		code.add(new ShapeSquare(4.295, 15.047, 4.996, 16.748));
+		code.add(new ShapeSquare(3.295, 15.047, 3.995, 16.748));
+		code.add(new ShapeSquare(2.296, 15.047, 2.997, 16.748));
+		code.add(new ShapeSquare(1.296, 15.047, 1.996, 16.748));
+		code.add(new ShapeSquare(0.295, 15.047, 0.995, 16.748));
+		code.add(new ShapeSquare(0.295, 8.697, 0.995, 10.398));
+		code.add(new ShapeSquare(1.296, 8.697, 1.996, 10.398));
+		code.add(new ShapeSquare(2.296, 8.697, 2.997, 10.398));
+		code.add(new ShapeSquare(3.295, 8.697, 3.995, 10.398));
+		code.add(new ShapeSquare(4.295, 8.697, 4.996, 10.398));
+		code.add(new ShapeSquare(3.856, 6.874, 4.556, 7.874));
+		code.add(new ShapeSquare(2.355, 6.874, 3.055, 7.874));
+		code.add(new ShapeSquare(2.735, 5.3, 3.935, 6.77));
+		code.add(new ShapeSquare(5.3, 5.3, 6.77, 6.77));
+		code.add(new ShapeSquare(-0.1, 5.3, 1.37, 6.77));
+		code.finalize();
+		assertGCode(TEST_SIMPLE_STENCIL, code);
 	}
 
 }
