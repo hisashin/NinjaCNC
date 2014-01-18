@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import st.tori.cnc.stencil.gcode.parser.GCode;
+
 /*
 	G21
 	Programming in millimeters (mm)
@@ -10,7 +12,7 @@ package st.tori.cnc.stencil.gcode.action;
 public class GAction21 extends GAction {
 
 	@Override
-	protected int getGIndex() {	return 21;	}
+	public int getGIndex() {	return 21;	}
 	@Override
 	public boolean isFundamental() {	return true;	}
 

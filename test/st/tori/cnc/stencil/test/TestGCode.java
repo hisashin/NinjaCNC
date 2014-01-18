@@ -7,9 +7,9 @@ import java.io.File;
 import org.junit.Test;
 
 import st.tori.cnc.stencil.canvas.shape.Square;
-import st.tori.cnc.stencil.gcode.action.GCode;
 import st.tori.cnc.stencil.gcode.drill.DrillOriminVC;
 import st.tori.cnc.stencil.gcode.exception.GCodeException;
+import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gcode.parser.GCodeParser;
 import st.tori.cnc.stencil.util.FileUtil;
 

@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import st.tori.cnc.stencil.canvas.PositionXYZInterface;
+import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
 
 /*
@@ -19,7 +21,7 @@ import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
 public class GAction01 extends GAction implements PositionXYZInterface,SpeedInterface {
 
 	@Override
-	protected int getGIndex() {	return 1;	}
+	public int getGIndex() {	return 1;	}
 
 	public GAction01(GCode gCode) {
 		super(gCode);

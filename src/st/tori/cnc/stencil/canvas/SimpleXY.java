@@ -1,6 +1,5 @@
-package st.tori.cnc.stencil.canvas.shape;
+package st.tori.cnc.stencil.canvas;
 
-import st.tori.cnc.stencil.gcode.action.PositionXYInterface;
 
 public class SimpleXY implements PositionXYInterface {
 

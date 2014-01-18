@@ -3,6 +3,7 @@ package st.tori.cnc.stencil.gcode.action;
 import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gcode.exception.InvalidIndexException;
 import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
+import st.tori.cnc.stencil.gcode.parser.GCode;
 
 public class ActionFactory {
 

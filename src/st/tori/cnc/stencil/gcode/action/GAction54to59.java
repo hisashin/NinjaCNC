@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import st.tori.cnc.stencil.gcode.parser.GCode;
+
 /*
 	G54 to G59
 	Work coordinate systems (WCSs)
@@ -11,7 +13,7 @@ package st.tori.cnc.stencil.gcode.action;
 public class GAction54to59 extends GAction {
 
 	@Override
-	protected int getGIndex() {	return 0;	}
+	public int getGIndex() {	return gIndex;	}
 
 	public GAction54to59(GCode gCode) {
 		super(gCode);

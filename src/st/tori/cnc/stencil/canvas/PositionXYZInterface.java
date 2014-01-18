@@ -1,4 +1,5 @@
-package st.tori.cnc.stencil.gcode.action;
+package st.tori.cnc.stencil.canvas;
+
 
 public interface PositionXYZInterface extends PositionXYInterface {
 

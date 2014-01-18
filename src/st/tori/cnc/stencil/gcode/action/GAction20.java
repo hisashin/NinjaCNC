@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import st.tori.cnc.stencil.gcode.parser.GCode;
+
 /*
 	G20
 	Programming in inches
@@ -15,7 +17,7 @@ package st.tori.cnc.stencil.gcode.action;
 public class GAction20 extends GAction {
 
 	@Override
-	protected int getGIndex() {	return 20;	}
+	public int getGIndex() {	return 20;	}
 	@Override
 	public boolean isFundamental() {	return true;	}
 

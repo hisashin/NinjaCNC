@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import st.tori.cnc.stencil.canvas.PositionXYZInterface;
 import st.tori.cnc.stencil.gcode.action.ActionFactory;
 import st.tori.cnc.stencil.gcode.action.GAction;
-import st.tori.cnc.stencil.gcode.action.GCode;
-import st.tori.cnc.stencil.gcode.action.PositionXYZInterface;
 import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gcode.exception.InvalidIndexException;
 import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;

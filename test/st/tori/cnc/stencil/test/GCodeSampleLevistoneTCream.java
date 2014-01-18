@@ -1,8 +1,8 @@
 package st.tori.cnc.stencil.test;
 
 import st.tori.cnc.stencil.canvas.shape.Square;
-import st.tori.cnc.stencil.gcode.action.GCode;
 import st.tori.cnc.stencil.gcode.drill.DrillOriminVC;
+import st.tori.cnc.stencil.gcode.parser.GCode;
 
 public class GCodeSampleLevistoneTCream extends GCode {
 

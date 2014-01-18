@@ -1,11 +1,13 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import st.tori.cnc.stencil.canvas.PositionXYZInterface;
+import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
 
 public abstract class GAction implements ActionInterface {
 	
-	protected abstract int getGIndex();
+	public abstract int getGIndex();
 	
 	public GAction(GCode gCode) {
 		inherit(gCode);

@@ -1,6 +1,7 @@
 package st.tori.cnc.stencil.canvas.shape;
 
-import st.tori.cnc.stencil.gcode.action.PositionXYInterface;
+import st.tori.cnc.stencil.canvas.PositionXYInterface;
+import st.tori.cnc.stencil.canvas.SimpleXY;
 
 public class Square extends Polygon {
 

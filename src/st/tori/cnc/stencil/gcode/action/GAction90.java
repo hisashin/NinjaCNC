@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.gcode.action;
 
+import st.tori.cnc.stencil.gcode.parser.GCode;
+
 /*
 	G90
 	Absolute programming	
@@ -15,7 +17,7 @@ package st.tori.cnc.stencil.gcode.action;
 public class GAction90 extends GAction {
 	
 	@Override
-	protected int getGIndex() {	return 90;	}
+	public int getGIndex() {	return 90;	}
 	@Override
 	public boolean isFundamental() {	return true;	}
 
