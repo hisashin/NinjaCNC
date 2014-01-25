@@ -11,16 +11,11 @@ import st.tori.cnc.stencil.canvas.PositionXYInterface;
 
 public class DimensionController {
 
-	private static final int DIMENSION_WIDTH		 = 1400;
-	private static final int DIMENSION_HEIGHT		 = 800;
-	private static final int DIMENSION_MIN_MERGIN	 = 50;
-	
-	public static final Dimension DIMEINSION = new Dimension(DIMENSION_WIDTH, DIMENSION_HEIGHT);
-	
 	private boolean debug;
 	private Applet applet;
 	private Graphics graphics;
 	private PositionXYInterface[] xyMinMax;
+	private double yHeight;
 	private double xMergin;
 	private double yMergin;
 	private double xyWidth;
@@ -32,19 +27,23 @@ public class DimensionController {
 		this.applet = applet;
 		this.graphics = graphics;
 		this.xyMinMax = xyMinMax;
+		Dimension dimension = applet.getSize();
+		this.yHeight = dimension.getHeight();
+		double xWidth = dimension.getWidth();
+		double minMergin = Math.min(yHeight, xWidth)*0.1;
 		if(xyMinMax!=null) {
 			this.xyWidth = xyMinMax[1].getX()-xyMinMax[0].getX();
 			this.xyHeight = xyMinMax[1].getY()-xyMinMax[0].getY();
-			if(xyHeight/xyWidth > (DIMENSION_HEIGHT-2*DIMENSION_MIN_MERGIN)/(DIMENSION_WIDTH-2*DIMENSION_MIN_MERGIN)) {
+			if(xyHeight/xyWidth > (yHeight-2*minMergin)/(xWidth-2*minMergin)) {
 				//fill Y
-				yMergin = DIMENSION_MIN_MERGIN;
-				ratio = (DIMENSION_HEIGHT-2*DIMENSION_MIN_MERGIN)/xyHeight;
-				xMergin = (DIMENSION_WIDTH - ratio*xyWidth)/2;
+				yMergin = minMergin;
+				ratio = (yHeight-2*minMergin)/xyHeight;
+				xMergin = (xWidth - ratio*xyWidth)/2;
 			}else{
 				//fill X
-				xMergin = DIMENSION_MIN_MERGIN;
-				ratio = (DIMENSION_WIDTH-2*DIMENSION_MIN_MERGIN)/xyWidth;
-				yMergin = (DIMENSION_HEIGHT - ratio*xyHeight)/2;
+				xMergin = minMergin;
+				ratio = (xWidth-2*minMergin)/xyWidth;
+				yMergin = (yHeight - ratio*xyHeight)/2;
 			}
 		}
 	}
@@ -64,7 +63,7 @@ public class DimensionController {
 		return (int)(xMergin + (x - xyMinMax[0].getX())*ratio);
 	}
 	private int getYtoShow(double y) {
-		return (int)(DIMENSION_HEIGHT - yMergin - (y - xyMinMax[0].getY())*ratio);
+		return (int)(yHeight - yMergin - (y - xyMinMax[0].getY())*ratio);
 	}
 	
 	public void _paint(Applet applet, Graphics g) {
