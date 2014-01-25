@@ -15,7 +15,7 @@ public class TestApplet extends Applet {
 	public void paint(Graphics g) {
 		try {
 			GCodeParser gcParser = new GCodeParser();
-			GCode code = gcParser.parse(Drill.ORIMIN_VC, new File("../gerber/levistone_tcream.ncd"));
+			GCode code = gcParser.parse(Drill.ORIMIN_VC, new File("../gerber/Levistone_tcream.ncd"));
 			DimensionController dc = new DimensionController(true,this,g,code.getXYMinMax());
 			code.draw(dc);
 		} catch (GCodeException e) {

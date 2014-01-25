@@ -9,11 +9,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		GerberParser gbParser = new GerberParser();
-		Gerber gerber = gbParser.parse(new File("gerber/levistone_tcream.gtp"));
+		Gerber gerber = gbParser.parse(new File("gerber/Levistone_tcream.gtp"));
 		/*
 		try {
 			GCodeParser gcParser = new GCodeParser();
-			GCode codeNcd = gcParser.parse(new File("gerber/levistone_tcream.ncd"));
+			GCode codeNcd = gcParser.parse(new File("gerber/Levistone_tcream.ncd"));
 		} catch (GCodeException e) {
 			e.printStackTrace();
 		}

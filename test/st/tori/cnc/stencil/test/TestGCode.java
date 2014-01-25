@@ -11,7 +11,11 @@ import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.GCodeException;
 import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gcode.parser.GCodeParser;
+import st.tori.cnc.stencil.gerber.exception.GerberException;
+import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.parser.GerberParser;
 import st.tori.cnc.stencil.util.FileUtil;
+import st.tori.cnc.stencil.util.GCodeUtil;
 
 public class TestGCode {
 
@@ -72,16 +76,49 @@ public class TestGCode {
 	}
 	@Test
 	public void testSimpleStencilWithSquareFromFile() {
-		assertGCode(FileUtil.readFileAsString(new File("gerber/levistone_tcream.ncd")),
+		assertGCode(FileUtil.readFileAsString(new File("gerber/Levistone_tcream.ncd")),
 				new GCodeSampleLevistoneTCream());
 	}
 	@Test
 	public void testParser() {
 		try {
-			File file = new File("gerber/levistone_tcream.ncd");
+			File file = new File("gerber/Levistone_tcream.ncd");
 			GCodeParser gcParser = new GCodeParser();
 			GCode codeNcd = gcParser.parse(Drill.ORIMIN_VC, file);
 			assertGCode(FileUtil.readFileAsString(file), codeNcd);
+		} catch (GCodeException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+	@Test
+	public void testCreateGCodeForSolderStencil() {
+		GerberParser gbParser = new GerberParser();
+		Gerber creamGerber = gbParser.parse(new File("gerber/Levistone_tcream.gtp"));
+		GCode code = GCodeUtil.createGCodeForSolderStencil(creamGerber,Drill.ORIMIN_VC);
+		fail();
+	}
+	@Test
+	public void testDeppDrilling4CornerHoles() {
+		try {
+			File file = new File("gerber/Leviston-cmp.ncd");
+			GCodeParser gcParser = new GCodeParser();
+			GCode _code = gcParser.parse(Drill.ORIMIN_VC, file);
+			GCode code = GCodeUtil.deppDrilling4CornerHoles(_code);
+			fail();
+		} catch (GCodeException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+	@Test
+	public void testChangeDrillForOutline() {
+		try {
+			File file = new File("gerber/Levistone-sol-out.ncd");
+			GCodeParser gcParser = new GCodeParser();
+			GCode _code = gcParser.parse(Drill.ORIMIN_VC, file);
+			GCode code = GCodeUtil.changeDrillForOutline(_code);
+			fail();
 		} catch (GCodeException e) {
 			e.printStackTrace();
 			fail(e.getMessage());

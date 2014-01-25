@@ -24,7 +24,7 @@ public class TestGerber {
 	
 	@Test
 	public void testSimpleStencilWithSquareFromFile() {
-		assertGerber(FileUtil.readFileAsString(new File("gerber/levistone_tcream.gtp")),
+		assertGerber(FileUtil.readFileAsString(new File("gerber/Levistone_tcream.gtp")),
 				new GerberSampleLevistoneTCream());
 	}
 
