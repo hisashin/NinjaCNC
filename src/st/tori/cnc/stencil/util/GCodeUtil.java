@@ -1,6 +1,6 @@
 package st.tori.cnc.stencil.util;
 
-import st.tori.cnc.stencil.gcode.drill.DrillInterface;
+import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.CannotDetectCornerHolesException;
 import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
@@ -10,7 +10,7 @@ public class GCodeUtil {
 	/*
 	 * Create GCode from Gerber
 	 */
-	public static GCode createGCodeForSolderStencil(Gerber creamGerber, DrillInterface drill) {
+	public static GCode createGCodeForSolderStencil(Gerber creamGerber, Drill drill) {
 		//TODO
 		return null;
 	}

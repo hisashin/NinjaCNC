@@ -5,8 +5,8 @@ import st.tori.cnc.stencil.canvas.PositionXYInterface;
 
 public class Polygon extends Polyline {
 
-	public Polygon(PositionXYInterface[] _xyArray) {
-		super(circle(_xyArray));
+	public Polygon(PositionXYInterface[] _xyArray, float stroke) {
+		super(circle(_xyArray),stroke);
 	}
 
 	private static PositionXYInterface[] circle(PositionXYInterface[] _xyArray) {

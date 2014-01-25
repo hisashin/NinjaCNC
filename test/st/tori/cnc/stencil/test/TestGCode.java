@@ -7,7 +7,7 @@ import java.io.File;
 import org.junit.Test;
 
 import st.tori.cnc.stencil.canvas.shape.Square;
-import st.tori.cnc.stencil.gcode.drill.DrillOriminVC;
+import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.GCodeException;
 import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gcode.parser.GCodeParser;
@@ -64,9 +64,9 @@ public class TestGCode {
 
 	@Test
 	public void testSquareCut() {
-		GCode code = new GCode();
-		code.initialize(new DrillOriminVC(), 5.0, 0.5, -0.15, 100.0, 300.0);
-		code.add(new Square(-0.1, -0.1, 1.37, 1.37));
+		GCode code = new GCode(Drill.ORIMIN_VC);
+		code.initialize(5.0, 0.5, -0.15, 100.0, 300.0);
+		code.add(new Square(-0.1, -0.1, 1.37, 1.37, 0.2f));
 		code.finalize();
 		assertGCode(TEST_HEADER+TEST_SQUARE_CUT+TEST_FOOTER, code);
 	}
@@ -80,7 +80,7 @@ public class TestGCode {
 		try {
 			File file = new File("gerber/levistone_tcream.ncd");
 			GCodeParser gcParser = new GCodeParser();
-			GCode codeNcd = gcParser.parse(file);
+			GCode codeNcd = gcParser.parse(Drill.ORIMIN_VC, file);
 			assertGCode(FileUtil.readFileAsString(file), codeNcd);
 		} catch (GCodeException e) {
 			e.printStackTrace();

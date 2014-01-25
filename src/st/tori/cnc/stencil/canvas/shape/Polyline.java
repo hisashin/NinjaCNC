@@ -9,9 +9,11 @@ import st.tori.cnc.stencil.canvas.applet.DimensionController;
 public class Polyline implements Drawable {
 
 	protected PositionXYInterface[] xyArray;
+	protected float stroke;
 	
-	public Polyline(PositionXYInterface[] xyArray) {
+	public Polyline(PositionXYInterface[] xyArray, float stroke) {
 		this.xyArray = xyArray;
+		this.stroke = stroke;
 	}
 	
 	public PositionXYInterface[] getXYArray(){	return xyArray;	}
@@ -37,11 +39,6 @@ public class Polyline implements Drawable {
 
 	@Override
 	public void draw(DimensionController dc) {
-		if(xyArray==null||xyArray.length<=1)return;
-		PositionXYInterface lastPosition = xyArray[0];
-		for(int i=1;i<xyArray.length;i++) {
-			dc.drawLine(lastPosition, xyArray[i]);
-			lastPosition = xyArray[i];
-		}
+		dc.drawPolyline(xyArray, stroke);
 	}
 }

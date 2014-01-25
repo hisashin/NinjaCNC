@@ -10,6 +10,7 @@ import st.tori.cnc.stencil.canvas.PositionXYZInterface;
 import st.tori.cnc.stencil.gcode.action.ActionFactory;
 import st.tori.cnc.stencil.gcode.action.Comment;
 import st.tori.cnc.stencil.gcode.action.GAction;
+import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gcode.exception.InvalidIndexException;
 import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
@@ -23,8 +24,8 @@ public class GCodeParser {
 	private static final Pattern PATTERN_COMMENT = Pattern.compile("\\(([^\\)]+)\\)");
 	private static final Pattern PATTERN = Pattern.compile("([A-Z])([\\.\\-0-9]+)");
 
-	public GCode parse(File file) throws UnsupportedPrefixException, InvalidIndexException, PositionNotSupportedException, SpeedNotSupportedException, NoLastActionExistsException, IllegalReflectionException {
-		GCode gCode = new GCode();
+	public GCode parse(Drill drill, File file) throws UnsupportedPrefixException, InvalidIndexException, PositionNotSupportedException, SpeedNotSupportedException, NoLastActionExistsException, IllegalReflectionException {
+		GCode gCode = new GCode(drill);
 		GAction action = null;
 		String line;
 		List<String> list = FileUtil.readFileAsStringList(file);

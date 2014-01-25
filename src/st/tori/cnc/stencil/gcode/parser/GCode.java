@@ -23,7 +23,7 @@ import st.tori.cnc.stencil.gcode.action.GAction90;
 import st.tori.cnc.stencil.gcode.action.GAction91;
 import st.tori.cnc.stencil.gcode.action.MAction03;
 import st.tori.cnc.stencil.gcode.action.MAction30;
-import st.tori.cnc.stencil.gcode.drill.DrillInterface;
+import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedProgramException;
@@ -37,14 +37,14 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 
 	private static final String RET = "\n";
 
-	private DrillInterface drill;
+	private Drill drill;
 	private double initialAirCutHeight = Double.MAX_VALUE;
 	private double airCutHeight = Double.MAX_VALUE;
 	private double cutHeight = Double.MAX_VALUE;
 	private double downSpeed = 0;
 	private double cutSpeed = 0;
 	
-	public DrillInterface getDrill(){	return drill;	}
+	public Drill getDrill(){	return drill;	}
 	public double getAirCutHeight(){	return airCutHeight;	}
 	public double getCutHeight(){	return cutHeight;	}
 	public double getDownSpeed(){	return downSpeed;	}
@@ -53,12 +53,15 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 	private boolean initialized = false;
 	private boolean finalized = false;
 	
-	public final void initialize(DrillInterface drill, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
-		initialize(drill, UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
-	}
-	public final void initialize(DrillInterface drill, UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
-		initialized = true;
+	public GCode(Drill drill) {
 		this.drill = drill;
+	}
+	
+	public final void initialize(double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
+		initialize(UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
+	}
+	public final void initialize(UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
+		initialized = true;
 		this.initialAirCutHeight = initialAirCutHeight;
 		this.airCutHeight = airCutHeight;
 		this.cutHeight = cutHeight;
@@ -244,8 +247,11 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		if(action instanceof GAction)
 			lastAction = (GAction)action;
 		if(action instanceof PositionXYZInterface) {
-			if(lastPosition!=null && PositionUtil.isCutting(lastPosition, (PositionXYZInterface)action))
-				drawables.add(new Line(lastPosition, (PositionXYInterface)action));
+			if(lastPosition!=null && PositionUtil.isCutting(lastPosition, (PositionXYZInterface)action)) {
+				drawables.add(new Line(lastPosition, (PositionXYInterface)action,
+						drill.getDiameter(-((PositionXYZInterface)action).getZ())));
+				
+			}
 			lastPosition = (PositionXYZInterface)action;
 		}
 		if(action instanceof SpeedInterface)

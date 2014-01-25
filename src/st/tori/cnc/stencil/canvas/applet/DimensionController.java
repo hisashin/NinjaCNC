@@ -1,12 +1,13 @@
 package st.tori.cnc.stencil.canvas.applet;
 
 import java.applet.Applet;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
-import st.tori.cnc.stencil.canvas.SimpleXY;
 
 public class DimensionController {
 
@@ -24,6 +25,7 @@ public class DimensionController {
 	private double yMergin;
 	private double xyWidth;
 	private double xyHeight;
+	private double ratio;
 	
 	public DimensionController(boolean debug, Applet applet, Graphics graphics, PositionXYInterface[] xyMinMax) {
 		this.debug = debug;
@@ -36,32 +38,33 @@ public class DimensionController {
 			if(xyHeight/xyWidth > (DIMENSION_HEIGHT-2*DIMENSION_MIN_MERGIN)/(DIMENSION_WIDTH-2*DIMENSION_MIN_MERGIN)) {
 				//fill Y
 				yMergin = DIMENSION_MIN_MERGIN;
-				xMergin = (DIMENSION_WIDTH - (DIMENSION_HEIGHT-2*DIMENSION_MIN_MERGIN)/xyHeight*xyWidth)/2;
+				ratio = (DIMENSION_HEIGHT-2*DIMENSION_MIN_MERGIN)/xyHeight;
+				xMergin = (DIMENSION_WIDTH - ratio*xyWidth)/2;
 			}else{
 				//fill X
 				xMergin = DIMENSION_MIN_MERGIN;
-				yMergin = (DIMENSION_HEIGHT - (DIMENSION_WIDTH-2*DIMENSION_MIN_MERGIN)/xyWidth*xyHeight)/2;
+				ratio = (DIMENSION_WIDTH-2*DIMENSION_MIN_MERGIN)/xyWidth;
+				yMergin = (DIMENSION_HEIGHT - ratio*xyHeight)/2;
 			}
 		}
-		if(debug) {
-			//drawMerginSquare();
-		}
-	}
-	private void drawMerginSquare() {
-		drawLine(new SimpleXY(xyMinMax[0].getX(), xyMinMax[0].getY()), new SimpleXY(xyMinMax[1].getX(), xyMinMax[0].getY()));
-		drawLine(new SimpleXY(xyMinMax[1].getX(), xyMinMax[0].getY()), new SimpleXY(xyMinMax[1].getX(), xyMinMax[1].getY()));
-		drawLine(new SimpleXY(xyMinMax[1].getX(), xyMinMax[1].getY()), new SimpleXY(xyMinMax[0].getX(), xyMinMax[1].getY()));
-		drawLine(new SimpleXY(xyMinMax[0].getX(), xyMinMax[1].getY()), new SimpleXY(xyMinMax[0].getX(), xyMinMax[0].getY()));
 	}
 	
-	public void drawLine(PositionXYInterface p0, PositionXYInterface p1) {
-		graphics.drawLine(getXtoShow(p0.getX()), getYtoShow(p0.getY()), getXtoShow(p1.getX()), getYtoShow(p1.getY()));
+	public void drawPolyline(PositionXYInterface[] xyArray, float stroke) {
+		if(xyArray==null||xyArray.length<=1)return;
+		if(stroke>0)
+			((Graphics2D)graphics).setStroke(new BasicStroke((float)(stroke*ratio)));
+		PositionXYInterface lastPosition = xyArray[0];
+		for(int i=1;i<xyArray.length;i++) {
+			graphics.drawLine(getXtoShow(lastPosition.getX()), getYtoShow(lastPosition.getY()), 
+					getXtoShow(xyArray[i].getX()), getYtoShow(xyArray[i].getY()));
+			lastPosition = xyArray[i];
+		}
 	}
 	private int getXtoShow(double x) {
-		return (int)(xMergin + (x - xyMinMax[0].getX())/xyWidth*(DIMENSION_WIDTH-2*xMergin));
+		return (int)(xMergin + (x - xyMinMax[0].getX())*ratio);
 	}
 	private int getYtoShow(double y) {
-		return (int)(DIMENSION_HEIGHT - yMergin - (y - xyMinMax[0].getY())/xyHeight*(DIMENSION_HEIGHT-2*yMergin));
+		return (int)(DIMENSION_HEIGHT - yMergin - (y - xyMinMax[0].getY())*ratio);
 	}
 	
 	public void _paint(Applet applet, Graphics g) {
