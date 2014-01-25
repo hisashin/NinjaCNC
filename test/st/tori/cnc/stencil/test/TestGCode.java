@@ -11,7 +11,6 @@ import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.GCodeException;
 import st.tori.cnc.stencil.gcode.parser.GCode;
 import st.tori.cnc.stencil.gcode.parser.GCodeParser;
-import st.tori.cnc.stencil.gerber.exception.GerberException;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 import st.tori.cnc.stencil.gerber.parser.GerberParser;
 import st.tori.cnc.stencil.util.FileUtil;
@@ -26,6 +25,7 @@ public class TestGCode {
 	private static String clean(String str) {
 		if(str==null)return str;
 		str = str.replaceAll(" ", "");
+		str = str.replaceAll("Y00.000", "Y0.000");
 		//str = str.replaceAll("\\([^\\)]*\\)(\n)?", "");
 		return str;
 	}

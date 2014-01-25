@@ -225,9 +225,6 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 	protected final boolean isSpindleOn(){
 		return (spindle==SPINDLE.ON);
 	}
-	public boolean isEqual(GCode code) {
-		return false;
-	}
 	
 	@Override
 	public final boolean add(ActionInterface action) {

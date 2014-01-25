@@ -6,25 +6,23 @@ import java.util.List;
 
 import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
-import st.tori.cnc.stencil.canvas.PositionXYZInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
-import st.tori.cnc.stencil.canvas.shape.Polygon;
-import st.tori.cnc.stencil.gcode.statement.StatementInterface;
-import st.tori.cnc.stencil.gcode.statement.Comment;
-import st.tori.cnc.stencil.gcode.statement.MStatement03;
-import st.tori.cnc.stencil.gcode.statement.MStatement30;
-import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
-import st.tori.cnc.stencil.gcode.exception.NoLastStatementExistsException;
-import st.tori.cnc.stencil.gcode.exception.NoSpecifiedProgramException;
-import st.tori.cnc.stencil.gcode.exception.NoSpecifiedUnitException;
-import st.tori.cnc.stencil.gcode.parser.GCode;
-import st.tori.cnc.stencil.gcode.parser.SpeedInterface;
+import st.tori.cnc.stencil.canvas.applet.DimensionController;
+import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
+import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
 import st.tori.cnc.stencil.gerber.statement.GStatement;
+import st.tori.cnc.stencil.gerber.statement.GStatement02;
+import st.tori.cnc.stencil.gerber.statement.GStatement03;
+import st.tori.cnc.stencil.gerber.statement.GStatement36;
+import st.tori.cnc.stencil.gerber.statement.GStatement37;
+import st.tori.cnc.stencil.gerber.statement.GStatement74;
+import st.tori.cnc.stencil.gerber.statement.GStatement75;
+import st.tori.cnc.stencil.gerber.statement.MStatement02;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
 
 
-public class Gerber extends ArrayList<StatementInterface> {
+public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 
 	private static final String RET = "\n";
 
@@ -32,50 +30,11 @@ public class Gerber extends ArrayList<StatementInterface> {
 	private boolean finalized = false;
 	
 	public final void initialize() {
-		initialize();
-	}
-	public final void initialize() {
 		initialized = true;
-		
-		if(unit==UNIT.MM)
-			add(new GStatement21(this));
-		else if(unit==UNIT.INCH)
-			add(new GStatement20(this));
-		//Set exact stop mode without mind
-		add(new GStatement61(this));
-		if(prog==PROG.ABSOLUTE)
-			add(new GStatement90(this));
-		else if(prog==PROG.INCREMENTAL)
-			add(new GStatement91(this));
-		//Move to origin,at height of initialAirCutHeight
-		{
-			GStatement00 statement = new GStatement00(this);
-			statement.setX(0);
-			statement.setY(0);
-			statement.setZ(initialAirCutHeight);
-			add(statement);
-		}
-		//Spindle on
-		add(new MStatement03());
-		//Close to the surface at height of airCutHeight
-		{
-			GStatement00 statement = new GStatement00(this);
-			statement.setZ(airCutHeight);
-			add(statement);
-		}
 	}
 	public final void finalize() {
 		if(!initialized)return;
-		add(new Comment("Footer"));
-		add(new GStatement61(this));
-		{
-			GStatement00 statement = new GStatement00(this);
-			statement.setX(0);
-			statement.setY(0);
-			statement.setZ(initialAirCutHeight);
-			add(statement);
-		}
-		add(new MStatement30());
+		add(new MStatement02());
 		finalized = true;
 	}
 		
@@ -83,61 +42,21 @@ public class Gerber extends ArrayList<StatementInterface> {
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		Iterator<StatementInterface> ite = super.iterator();
-		boolean zChanged = false;
 		StatementInterface lastStatement = null;
 		GStatement lastGStatement = null;
-		PositionXYZInterface lastPosition = null;
-		SpeedInterface lastSpeed = null;
+		PositionXYInterface lastPosition = null;
 		while(ite.hasNext()) {
 			StatementInterface statement = ite.next();
-			if((lastStatement!=null&&lastStatement instanceof Comment)
-				||(buf.length()>0 
-						&& (!(statement instanceof GStatement) 
-								|| (!((GStatement)statement).isFundamental())) 
-								|| (lastGStatement!=null&&!lastGStatement.isFundamental())))
+			if(lastStatement!=null)
 				buf.append(RET);
-			if(statement instanceof GStatement) {
-				GStatement gStatement = (GStatement)statement;
-				if(lastGStatement == null || lastGStatement.getGIndex() != gStatement.getGIndex()) {
-					//Write G when gIndex changed
-					buf.append(statement.getSimpleName());
-				}else if(zChanged
-						&& lastPosition !=null
-						&& (((PositionXYZInterface)gStatement).getX() != lastPosition.getX()
-							||((PositionXYZInterface)gStatement).getY() != lastPosition.getY())) {
-					//Write G just after Z changed and XY will change
-					buf.append(statement.getSimpleName());
-				}else if(gStatement instanceof PositionXYZInterface 
-						&& lastPosition != null 
-						&& ((PositionXYZInterface)gStatement).getZ() != lastPosition.getZ()) {
-					//Skip G if Z unchanged
-					buf.append(statement.getSimpleName());
-				}
-				lastGStatement = gStatement;
-			}else{
-				buf.append(statement.getSimpleName());
-			}
-			if(statement instanceof PositionXYZInterface) {
-				PositionXYZInterface position = (PositionXYZInterface)statement;
-				zChanged = false;
-				if(lastPosition==null||lastPosition.getZ()!=position.getZ()) {
-					buf.append("Z").append(NumberUtil.toGCodeValue(position.getZ()));
-					zChanged = true;
-				}
+			buf.append(statement.getSimpleName());
+			if(statement instanceof PositionXYInterface) {
+				PositionXYInterface position = (PositionXYInterface)statement;
 				if(lastPosition==null||lastPosition.getX()!=position.getX()||lastPosition.getY()!=position.getY()) {
-					if(zChanged) {
-						buf.append(RET).append(statement.getSimpleName());
-					}
 					buf.append("X").append(NumberUtil.toGCodeValue(position.getX()));
 					buf.append("Y").append(NumberUtil.toGCodeValue(position.getY()));
 				}
 				lastPosition = position;
-			}
-			if(statement instanceof SpeedInterface) {
-				SpeedInterface speed = (SpeedInterface)statement;
-				if(lastSpeed==null||lastSpeed.getF()!=speed.getF())
-					buf.append("F").append(NumberUtil.toGCodeValue(speed.getF()));
-				lastSpeed = speed;
 			}
 			lastStatement = statement;
 		}
@@ -163,17 +82,15 @@ public class Gerber extends ArrayList<StatementInterface> {
 		MULTI,
 	}
 	
-	private UNIT unit = UNIT.UNDEF;
-	private PROG prog = PROG.UNDEF;
-	private SPINDLE spindle = SPINDLE.OFF;
+	private INTERPOLATION_MODE interpolation = INTERPOLATION_MODE.UNDEF;
+	private REGION_MODE region = REGION_MODE.UNDEF;
+	private QUADRANT_MODE quadrant = QUADRANT_MODE.UNDEF;
 	
 	private GStatement lastStatement = null;
-	private PositionXYZInterface lastPosition = null;
-	private SpeedInterface lastSpeed = null;
+	private PositionXYInterface lastPosition = null;
 	
 	public GStatement getLastStatement(){	return lastStatement;	}
-	public PositionXYZInterface getLastPosition(){	return lastPosition;	}
-	public SpeedInterface getLastSpeed(){	return lastSpeed;	}
+	public PositionXYInterface getLastPosition(){	return lastPosition;	}
 	
 	public GStatement cloneLastStatement() throws NoLastStatementExistsException, IllegalReflectionException {
 		if(lastStatement==null)
@@ -185,43 +102,58 @@ public class Gerber extends ArrayList<StatementInterface> {
 			throw new IllegalReflectionException(e);
 		}
 	}
-
-	protected final void isReadyToMove() throws NoSpecifiedUnitException, NoSpecifiedProgramException {
-		if(unit==UNIT.UNDEF)throw new NoSpecifiedUnitException();
-		if(prog==PROG.UNDEF)throw new NoSpecifiedProgramException();
-	}
-	protected final boolean isSpindleOn(){
-		return (spindle==SPINDLE.ON);
-	}
-	public boolean isEqual(GCode code) {
-		return false;
-	}
 	
 	@Override
 	public final boolean add(StatementInterface statement) {
-		if(statement instanceof GStatement20) {
-			unit = UNIT.INCH;
-		}else if(statement instanceof GStatement21){
-			unit = UNIT.MM;
-		}else if(statement instanceof GStatement90) {
-			prog = PROG.ABSOLUTE;
-		}else if(statement instanceof GStatement91){
-			prog = PROG.INCREMENTAL;
-		}else if(statement instanceof MStatement03) {
-			spindle = SPINDLE.ON;
-		}else if(statement instanceof MStatement30) {
-			spindle = SPINDLE.OFF;
+		if(statement instanceof GStatement02) {
+			interpolation = INTERPOLATION_MODE.CLOCKWISE_CIRCULAR;
+		}else if(statement instanceof GStatement03) {
+			interpolation = INTERPOLATION_MODE.COUNTERCLOCKWISE_CIRCULAR;
+		}else if(statement instanceof GStatement36) {
+			region = REGION_MODE.ON;
+		}else if(statement instanceof GStatement37) {
+			region = REGION_MODE.OFF;
+		}else if(statement instanceof GStatement74) {
+			quadrant = QUADRANT_MODE.SINGLE;
+		}else if(statement instanceof GStatement75) {
+			quadrant = QUADRANT_MODE.MULTI;
 		}
 		if(statement instanceof GStatement)
 			lastStatement = (GStatement)statement;
-		if(statement instanceof PositionXYZInterface)
-			lastPosition = (PositionXYZInterface)statement;
-		if(statement instanceof SpeedInterface)
-			lastSpeed = (SpeedInterface)statement;
+		if(statement instanceof PositionXYInterface)
+			lastPosition = (PositionXYInterface)statement;
 		return super.add(statement);
 	}
 	
 	private List<Drawable> drawables = new ArrayList<Drawable>();
+	@Override
+	public void draw(DimensionController dc) {
+		Iterator<Drawable> ite = drawables.iterator();
+		while(ite.hasNext())
+			ite.next().draw(dc);
+	}
+	
+	@Override
+	public PositionXYInterface[] getXYMinMax() {
+		if(drawables.size()<=0)return null;
+		PositionXYInterface minX = null;
+		PositionXYInterface minY = null;
+		PositionXYInterface maxX = null;
+		PositionXYInterface maxY = null;
+		for(int i=0;i<drawables.size();i++) {
+			PositionXYInterface[] xyMinMax = drawables.get(i).getXYMinMax();
+			if(xyMinMax==null)continue;
+			if(minX==null||xyMinMax[0].getX()<minX.getX())minX = xyMinMax[0];
+			if(minY==null||xyMinMax[0].getY()<minY.getY())minY = xyMinMax[0];
+			if(maxX==null||xyMinMax[1].getX()>maxX.getX())maxX = xyMinMax[1];
+			if(maxY==null||xyMinMax[1].getY()>maxY.getY())maxY = xyMinMax[1];
+		}
+		if(minX==null||minY==null||maxX==null||maxY==null)return null;
+		return new PositionXYInterface[]{
+			new SimpleXY(minX.getX(), minY.getY()),
+			new SimpleXY(maxX.getX(), maxY.getY()),
+		};
+	}
 	
 	public final boolean add(Drawable drawable) {
 		return drawables.add(drawable);

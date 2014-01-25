@@ -1,6 +1,6 @@
 package st.tori.cnc.stencil.gerber.statement;
 
-import st.tori.cnc.stencil.canvas.PositionXYZInterface;
+import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 import st.tori.cnc.stencil.util.NumberUtil;
 
@@ -13,11 +13,10 @@ public abstract class GStatement implements StatementInterface {
 	}
 	protected void inherit(Gerber gerber) {
 		if(gerber==null)return;
-		PositionXYZInterface lastPosition = gerber.getLastPosition();
-		if(lastPosition != null && this instanceof PositionXYZInterface) {
-			((PositionXYZInterface)this).setX(lastPosition.getX());
-			((PositionXYZInterface)this).setY(lastPosition.getY());
-			((PositionXYZInterface)this).setZ(lastPosition.getZ());
+		PositionXYInterface lastPosition = gerber.getLastPosition();
+		if(lastPosition != null && this instanceof PositionXYInterface) {
+			((PositionXYInterface)this).setX(lastPosition.getX());
+			((PositionXYInterface)this).setY(lastPosition.getY());
 		}
 	}
 	

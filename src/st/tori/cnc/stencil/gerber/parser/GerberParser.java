@@ -1,14 +1,19 @@
 package st.tori.cnc.stencil.gerber.parser;
 
-import java.beans.Statement;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
+import st.tori.cnc.stencil.gerber.exception.InvalidIndexException;
+import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
 import st.tori.cnc.stencil.gerber.statement.Comment;
+import st.tori.cnc.stencil.gerber.statement.GStatement;
 import st.tori.cnc.stencil.gerber.statement.MStatement02;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory;
+import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.FileUtil;
 
 
@@ -19,9 +24,9 @@ public class GerberParser {
 	private static final Pattern PATTERN_SINGLE_D	 = Pattern.compile("^D([0-9]{2})(.*)\\*$");
 	private static final Pattern PATTERN_SINGLE_ELSE = Pattern.compile("^%(.*)%");
 
-	public Gerber parse(File file) {
+	public Gerber parse(File file) throws InvalidIndexException, NoLastStatementExistsException, IllegalReflectionException {
 		Gerber gerber = new Gerber();
-		Statement statement = null;
+		GStatement statement = null;
 		String line;
 		List<String> list = FileUtil.readFileAsStringList(file);
 		Iterator<String> ite = list.iterator();
@@ -36,7 +41,7 @@ public class GerberParser {
 				continue;
 			}
 			if("M02*".equals(line)) {
-				gerber.add(new MStatement02());
+				gerber.finalize();
 				continue;
 			}
 			matcher = PATTERN_SINGLE_G.matcher(line);
