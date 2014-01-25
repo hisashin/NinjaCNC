@@ -8,6 +8,8 @@ import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.PositionXYZInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
+import st.tori.cnc.stencil.canvas.applet.DimensionController;
+import st.tori.cnc.stencil.canvas.shape.Line;
 import st.tori.cnc.stencil.canvas.shape.Polygon;
 import st.tori.cnc.stencil.gcode.action.ActionInterface;
 import st.tori.cnc.stencil.gcode.action.Comment;
@@ -27,14 +29,14 @@ import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedProgramException;
 import st.tori.cnc.stencil.gcode.exception.NoSpecifiedUnitException;
 import st.tori.cnc.stencil.util.NumberUtil;
+import st.tori.cnc.stencil.util.PositionUtil;
 
 
 
 public class GCode extends ArrayList<ActionInterface> implements Drawable {
 
-	private boolean initialized = false;
-	private boolean finalized = false;
-	
+	private static final String RET = "\n";
+
 	private DrillInterface drill;
 	private double initialAirCutHeight = Double.MAX_VALUE;
 	private double airCutHeight = Double.MAX_VALUE;
@@ -47,6 +49,9 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 	public double getCutHeight(){	return cutHeight;	}
 	public double getDownSpeed(){	return downSpeed;	}
 	public double getCutSpeed(){	return cutSpeed;	}
+	
+	private boolean initialized = false;
+	private boolean finalized = false;
 	
 	public final void initialize(DrillInterface drill, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
 		initialize(drill, UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
@@ -105,33 +110,32 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		add(new MAction30());
 		finalized = true;
 	}
-	
-	private static final String RET = "\n";
-	
+		
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		Iterator<ActionInterface> ite = super.iterator();
 		boolean zChanged = false;
-		GAction lastAction = null;
+		ActionInterface lastAction = null;
+		GAction lastGAction = null;
 		PositionXYZInterface lastPosition = null;
 		SpeedInterface lastSpeed = null;
 		while(ite.hasNext()) {
 			ActionInterface action = ite.next();
-			if(buf.length()>0 
-				&& (!(action instanceof GAction) 
-						|| (!((GAction)action).isFundamental())) 
-						|| (lastAction!=null&&!lastAction.isFundamental()))
+			if((lastAction!=null&&lastAction instanceof Comment)
+				||(buf.length()>0 
+						&& (!(action instanceof GAction) 
+								|| (!((GAction)action).isFundamental())) 
+								|| (lastGAction!=null&&!lastGAction.isFundamental())))
 				buf.append(RET);
 			if(action instanceof GAction) {
 				GAction gAction = (GAction)action;
-				if(lastAction == null || lastAction.getGIndex() != gAction.getGIndex()) {
+				if(lastGAction == null || lastGAction.getGIndex() != gAction.getGIndex()) {
 					//Write G when gIndex changed
 					buf.append(action.getSimpleName());
 				}else if(zChanged
 						&& lastPosition !=null
-						&& (((PositionXYZInterface)gAction).getX() != lastPosition.getX()
-							||((PositionXYZInterface)gAction).getY() != lastPosition.getY())) {
+						&& PositionUtil.isDistantXY(lastPosition, (PositionXYInterface)gAction)) {
 					//Write G just after Z changed and XY will change
 					buf.append(action.getSimpleName());
 				}else if(gAction instanceof PositionXYZInterface 
@@ -140,7 +144,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 					//Skip G if Z unchanged
 					buf.append(action.getSimpleName());
 				}
-				lastAction = gAction;
+				lastGAction = gAction;
 			}else{
 				buf.append(action.getSimpleName());
 			}
@@ -166,6 +170,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 					buf.append("F").append(NumberUtil.toGCodeValue(speed.getF()));
 				lastSpeed = speed;
 			}
+			lastAction = action;
 		}
 		buf.append(RET);
 		//Remove ret+ret which inserts around first Z-XY positioning
@@ -238,14 +243,23 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		}
 		if(action instanceof GAction)
 			lastAction = (GAction)action;
-		if(action instanceof PositionXYZInterface)
+		if(action instanceof PositionXYZInterface) {
+			if(lastPosition!=null && PositionUtil.isCutting(lastPosition, (PositionXYZInterface)action))
+				drawables.add(new Line(lastPosition, (PositionXYInterface)action));
 			lastPosition = (PositionXYZInterface)action;
+		}
 		if(action instanceof SpeedInterface)
 			lastSpeed = (SpeedInterface)action;
 		return super.add(action);
 	}
 	
 	private List<Drawable> drawables = new ArrayList<Drawable>();
+	@Override
+	public void draw(DimensionController dc) {
+		Iterator<Drawable> ite = drawables.iterator();
+		while(ite.hasNext())
+			ite.next().draw(dc);
+	}
 	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {

@@ -1,36 +1,20 @@
 package st.tori.cnc.stencil.canvas.shape;
 
-import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
-import st.tori.cnc.stencil.canvas.SimpleXY;
 
 
-public class Polygon implements Drawable {
+public class Polygon extends Polyline {
 
-	protected PositionXYInterface[] xyArray;
-	
-	public Polygon(PositionXYInterface[] xyArray) {
-		this.xyArray = xyArray;
+	public Polygon(PositionXYInterface[] _xyArray) {
+		super(circle(_xyArray));
+	}
+
+	private static PositionXYInterface[] circle(PositionXYInterface[] _xyArray) {
+		if(_xyArray==null||_xyArray.length<=0)return _xyArray;
+		PositionXYInterface[] xyArray = new PositionXYInterface[_xyArray.length+1];
+		for(int i=0;i<_xyArray.length;i++)xyArray[i] = _xyArray[i];
+		xyArray[xyArray.length-1] = xyArray[0];
+		return xyArray;
 	}
 	
-	public PositionXYInterface[] getXYArray(){	return xyArray;	}
-	@Override
-	public PositionXYInterface[] getXYMinMax() {
-		if(xyArray==null||xyArray.length<=0)return null;
-		PositionXYInterface minX = null;
-		PositionXYInterface minY = null;
-		PositionXYInterface maxX = null;
-		PositionXYInterface maxY = null;
-		for(int i=0;i<xyArray.length;i++) {
-			if(minX==null||xyArray[i].getX()<minX.getX())minX = xyArray[i];
-			if(minY==null||xyArray[i].getY()<minY.getY())minY = xyArray[i];
-			if(maxX==null||xyArray[i].getX()>maxX.getX())maxX = xyArray[i];
-			if(maxY==null||xyArray[i].getY()>maxY.getY())maxY = xyArray[i];
-		}
-		if(minX==null||minY==null||maxX==null||maxY==null)return null;
-		return new PositionXYInterface[]{
-			new SimpleXY(minX.getX(), minY.getY()),
-			new SimpleXY(maxX.getX(), maxY.getY()),
-		};
-	}
 }

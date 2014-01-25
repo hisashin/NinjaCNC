@@ -22,7 +22,7 @@ public class TestGCode {
 	private static String clean(String str) {
 		if(str==null)return str;
 		str = str.replaceAll(" ", "");
-		str = str.replaceAll("\\([^\\)]*\\)(\n)?", "");
+		//str = str.replaceAll("\\([^\\)]*\\)(\n)?", "");
 		return str;
 	}
 	
