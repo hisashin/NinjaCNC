@@ -22,8 +22,10 @@ public class ActionFactory {
 		else if(gIndex>=54&&gIndex<=59) {
 			action = new GAction54to59(gCode);
 			((GAction54to59)action).setGIndex(gIndex);
-		}else if(gIndex==61)
+		}else if(gIndex==61) {
 			action = new GAction61(gCode);
+		}else if(gIndex==64)
+			action = new GAction64(gCode);
 		else if(gIndex==90)
 			action = new GAction90(gCode);
 		else

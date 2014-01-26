@@ -123,6 +123,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		GAction lastGAction = null;
 		PositionXYZInterface lastPosition = null;
 		SpeedInterface lastSpeed = null;
+		boolean startMilling,printF;
 		while(ite.hasNext()) {
 			ActionInterface action = ite.next();
 			if((lastAction!=null&&lastAction instanceof Comment)
@@ -151,33 +152,36 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 			}else{
 				buf.append(action.getSimpleName());
 			}
+			startMilling = false;
 			if(action instanceof PositionXYZInterface) {
 				PositionXYZInterface position = (PositionXYZInterface)action;
 				zChanged = false;
 				if(lastPosition==null||lastPosition.getZ()!=position.getZ()) {
-					buf.append("Z").append(NumberUtil.toGCodeValue(position.getZ()));
+					buf.append(" Z").append(NumberUtil.toGCodeValue(position.getZ()));
 					zChanged = true;
 				}
 				if(lastPosition==null||lastPosition.getX()!=position.getX()||lastPosition.getY()!=position.getY()) {
 					if(zChanged) {
-						buf.append(RET).append(action.getSimpleName());
+						buf.append(RET).append(action.getSimpleName()+" ");
 					}
-					buf.append("X").append(NumberUtil.toGCodeValue(position.getX()));
-					buf.append("Y").append(NumberUtil.toGCodeValue(position.getY()));
+					buf.append(" X").append(NumberUtil.toGCodeValue(position.getX()));
+					buf.append(" Y").append(NumberUtil.toGCodeValue(position.getY()));
 				}
+				if(lastPosition!=null&&lastPosition.getZ()>0&&position.getZ()<=0)
+					startMilling = true;
 				lastPosition = position;
 			}
 			if(action instanceof SpeedInterface) {
 				SpeedInterface speed = (SpeedInterface)action;
-				if(lastSpeed==null||lastSpeed.getF()!=speed.getF())
-					buf.append("F").append(NumberUtil.toGCodeValue(speed.getF()));
+				if(lastSpeed==null||lastSpeed.getF()!=speed.getF()||startMilling)
+					buf.append(" F").append(NumberUtil.toGCodeValue(speed.getF()));
 				lastSpeed = speed;
 			}
 			lastAction = action;
 		}
 		buf.append(RET);
 		//Remove ret+ret which inserts around first Z-XY positioning
-		return buf.toString().replaceAll(RET+RET+"?", RET);
+		return buf.toString().replaceAll(RET+RET+"?", RET).replaceAll(RET+" X", RET+"X");
 	}
 	
 	public enum UNIT {
