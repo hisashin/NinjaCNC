@@ -1,8 +1,10 @@
 package st.tori.cnc.stencil.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.PositionXYZInterface;
@@ -81,10 +83,10 @@ public class GCodeUtil {
 	}
 	private static class Deepest4Corners {
 		
-		private List<ActionInterface> actions_minXminY;
-		private List<ActionInterface> actions_maxXminY;
-		private List<ActionInterface> actions_maxXmaxY;
-		private List<ActionInterface> actions_minXmaxY;
+		private CornerDrillingOperator corner_minXminY;
+		private CornerDrillingOperator corner_maxXminY;
+		private CornerDrillingOperator corner_maxXmaxY;
+		private CornerDrillingOperator corner_minXmaxY;
 		
 		public Deepest4Corners(GCode gCode) throws CannotDetectCornerHolesException {
 			PositionXYInterface minXminY = null;
@@ -119,58 +121,134 @@ public class GCodeUtil {
 				throw new CannotDetectCornerHolesException("Couldn't find distinct 4 holes");
 
 			try {
-				this.actions_minXminY = getCornerDrillingActions(gCode, minXminY);
+				this.corner_minXminY = getCornerDrillingOperator(gCode, minXminY);
 			} catch (NotCornerDrillingException e) {
 				throw new CannotDetectCornerHolesException("Corner minXminY is not corner drilling:"+e.getMessage());
 			}
 			try {
-				this.actions_maxXminY = getCornerDrillingActions(gCode, maxXminY);
+				this.corner_maxXminY = getCornerDrillingOperator(gCode, maxXminY);
 			} catch (NotCornerDrillingException e) {
 				throw new CannotDetectCornerHolesException("Corner maxXminY is not corner drilling:"+e.getMessage());
 			}
 			try {
-				this.actions_maxXmaxY = getCornerDrillingActions(gCode, maxXmaxY);
+				this.corner_maxXmaxY = getCornerDrillingOperator(gCode, maxXmaxY);
 			} catch (NotCornerDrillingException e) {
 				throw new CannotDetectCornerHolesException("Corner maxXmaxY is not corner drilling:"+e.getMessage());
 			}
 			try {
-				this.actions_minXmaxY = getCornerDrillingActions(gCode, minXmaxY);
+				this.corner_minXmaxY = getCornerDrillingOperator(gCode, minXmaxY);
 			} catch (NotCornerDrillingException e) {
 				throw new CannotDetectCornerHolesException("Corner minXmaxY is not corner drilling:"+e.getMessage());
 			}
 		}
 	}
-	private static List<ActionInterface> getCornerDrillingActions(GCode gCode, PositionXYInterface position) throws NotCornerDrillingException {
+	private static abstract class CornerDrillingOperator {
+		protected List<ActionInterface> relatedCut;
+		public CornerDrillingOperator(List<ActionInterface> relatedCut) {
+			this.relatedCut = relatedCut;
+		}
+	}
+	private static class SimpleDrilling extends CornerDrillingOperator {
+		
+		private PositionXYZInterface deepestPoint;
+		
+		public SimpleDrilling(List<ActionInterface> relatedCut) throws NotSimpleHoleDrillingException {
+			super(relatedCut);
+			if(relatedCut==null)throw new NotSimpleHoleDrillingException("Related cut contains no process");
+			if(relatedCut.size()!=3)
+				throw new NotSimpleHoleDrillingException("Related cut is not 3 stepped but "+relatedCut.size());
+			PositionXYZInterface p0 = (PositionXYZInterface)relatedCut.get(0);
+			PositionXYZInterface p1 = (PositionXYZInterface)relatedCut.get(1);
+			PositionXYZInterface p2 = (PositionXYZInterface)relatedCut.get(2);
+			if(p0==null||p1==null||p2==null)throw new NotSimpleHoleDrillingException("Position is ambiguous");
+			if(PositionUtil.isDistantXY(p0, p1)||PositionUtil.isDistantXY(p1, p2))throw new NotSimpleHoleDrillingException("Related cuts moves");
+			if(p0.getZ()<=0||p1.getZ()>0||p2.getZ()<=0)throw new NotSimpleHoleDrillingException("Related cut is not simple drill-down-up");
+			if(p0.getZ()!=p2.getZ())throw new NotSimpleHoleDrillingException("Related cut changes its height in process");
+			this.deepestPoint = p1;
+		}
+		
+	}
+	private static class LayerDrilling extends CornerDrillingOperator {
+		
+		private Map<Double, List<String>> MAP_DEPTH_BASED = new HashMap<Double, List<String>>();
+		private Map<String, List<Double>> MAP_XY_BASED = new HashMap<String, List<Double>>();
+		
+		public LayerDrilling(List<ActionInterface> relatedCut) throws NotLayerHoleDrillingException {
+			super(relatedCut);
+			if(relatedCut==null)throw new NotLayerHoleDrillingException("Related cut contains no process");
+			if(relatedCut.size()<3)
+				throw new NotLayerHoleDrillingException("Related cut is less than 3 stepped but "+relatedCut.size());
+			PositionXYZInterface pFirst = (PositionXYZInterface)relatedCut.get(0);
+			PositionXYZInterface pLast = (PositionXYZInterface)relatedCut.get(relatedCut.size()-1);
+			if(pFirst.getZ()<=0||pLast.getZ()<=0)
+				throw new NotLayerHoleDrillingException("First and last point is not aircutting");
+			if(pFirst.getZ()!=pLast.getZ())
+				throw new NotLayerHoleDrillingException("Related cut changes its height in process");
+			PositionXYZInterface lastPoint = pFirst;
+			String key;
+			for(int i=1;i<relatedCut.size()-1;i++) {
+				PositionXYZInterface p = (PositionXYZInterface)relatedCut.get(i);
+				if(p.getZ()>0)
+					throw new NotLayerHoleDrillingException(i+"th point is aircutting");
+				if(p.getZ()>lastPoint.getZ())
+					throw new NotLayerHoleDrillingException(i+"th point ("+p.getX()+","+p.getY()+","+p.getZ()+") is over than last ("+lastPoint.getX()+","+lastPoint.getY()+","+lastPoint.getZ()+")");
+				{
+					List<String> subList = MAP_DEPTH_BASED.get(p.getZ());
+					if(subList==null) {
+						subList = new ArrayList<String>();
+						MAP_DEPTH_BASED.put(p.getZ(), subList);
+					}
+					key = getXYKey(p);
+					if(!subList.contains(key))
+						subList.add(key);
+				}
+				{
+					key = getXYKey(p);
+					List<Double> subList = MAP_XY_BASED.get(key);
+					if(subList==null) {
+						subList = new ArrayList<Double>();
+						MAP_XY_BASED.put(key, subList);
+					}
+					if(!subList.contains(p.getZ()))
+						subList.add(p.getZ());
+				}
+				checkMapDepthBased();
+				checkMapXYBased();
+			}
+		}
+		private void checkMapDepthBased() throws NotLayerHoleDrillingException {
+			if(MAP_DEPTH_BASED.size()<=0)
+				throw new NotLayerHoleDrillingException("No Depth data");
+			Iterator<Double> ite = MAP_DEPTH_BASED.keySet().iterator();
+			while(ite.hasNext()) {
+				Double depth = ite.next();
+				List<String> list = MAP_DEPTH_BASED.get(depth);
+				if(list==null||list.size()<=0)
+					throw new NotLayerHoleDrillingException("No Depth data");
+			}
+		}
+		private void checkMapXYBased() throws NotLayerHoleDrillingException {
+			
+		}
+		private static String getXYKey(PositionXYInterface p) {
+			return p.getX()+"_"+p.getY();
+		}
+		
+	}
+	private static CornerDrillingOperator getCornerDrillingOperator(GCode gCode, PositionXYInterface position) throws NotCornerDrillingException {
 		List<List<ActionInterface>> relatedCuts = getRelatedCuts(gCode, position);
 		if(relatedCuts==null)throw new NotCornerDrillingException("No related cut found");
 		if(relatedCuts.size()!=1)throw new NotCornerDrillingException("More than 1 related cuts found");
+		List<ActionInterface> relatedCut = relatedCuts.get(0);
 		try {
-			if(isSimpleHoleDrilling(relatedCuts))
-				return relatedCuts.get(0);
-		} catch (NotSimpleHoleDrillingException e) {
+			return new SimpleDrilling(relatedCut);
+		} catch (NotSimpleHoleDrillingException e1) {
 			try {
-				if(isLayerHoleDrilling(relatedCuts))
-					return relatedCuts.get(0);
-			} catch (NotLayerHoleDrillingException e) {
-				throw new NotCornerDrillingException(e.getMessage());
+				return new LayerDrilling(relatedCut);
+			} catch (NotLayerHoleDrillingException e2) {
+				throw new NotCornerDrillingException(e2.getMessage());
 			}
 		}
-	}
-	private static boolean isSimpleHoleDrilling(List<List<ActionInterface>> relatedCuts) throws NotSimpleHoleDrillingException {
-		List<ActionInterface> subList = relatedCuts.get(0);
-		if(subList==null)throw new NotSimpleHoleDrillingException("Related cuts contains no process");
-		if(subList.size()!=3){
-			printRelatedCuts(relatedCuts, "NotSimpleHoleDrillingException");
-			throw new NotSimpleHoleDrillingException("Related cuts is not 3 stepped but "+subList.size());
-		}
-		PositionXYZInterface p0 = (PositionXYZInterface)subList.get(0);
-		PositionXYZInterface p1 = (PositionXYZInterface)subList.get(1);
-		PositionXYZInterface p2 = (PositionXYZInterface)subList.get(2);
-		if(p0==null||p1==null||p2==null)throw new NotSimpleHoleDrillingException("Position is ambiguous");
-		if(PositionUtil.isDistantXY(p0, p1)||PositionUtil.isDistantXY(p1, p2))throw new NotSimpleHoleDrillingException("Related cuts moves");
-		if(p0.getZ()<=0||p1.getZ()>0||p2.getZ()<=0)throw new NotSimpleHoleDrillingException("Related cuts are not simple drill-down-up");
-		if(p0.getZ()!=p2.getZ())throw new NotSimpleHoleDrillingException("Related cuts changes its height in process");
-		return true;
 	}
 	private static List<List<ActionInterface>> getRelatedCuts(GCode gCode, PositionXYInterface target) {
 		List<List<ActionInterface>> list = new ArrayList<List<ActionInterface>>();
