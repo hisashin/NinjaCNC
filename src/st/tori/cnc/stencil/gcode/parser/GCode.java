@@ -137,6 +137,9 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 				if(lastGAction == null || lastGAction.getGIndex() != gAction.getGIndex()) {
 					//Write G when gIndex changed
 					buf.append(action.getSimpleName());
+				}else if(!(gAction instanceof PositionXYInterface)) {
+					//Write G when not positional action
+					buf.append(action.getSimpleName());
 				}else if(zChanged
 						&& lastPosition !=null
 						&& PositionUtil.isDistantXY(lastPosition, (PositionXYInterface)gAction)) {

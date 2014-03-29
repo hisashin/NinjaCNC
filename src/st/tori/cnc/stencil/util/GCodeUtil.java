@@ -39,10 +39,7 @@ public class GCodeUtil {
 			ActionInterface action = ite.next();
 			if(action instanceof PositionXYZInterface) {
 				PositionXYZInterface position = (PositionXYZInterface)action;
-				if(!PositionUtil.isDistantXYZ(position, corners.deepest_minXminY)
-					||!PositionUtil.isDistantXYZ(position, corners.deepest_maxXminY)
-					||!PositionUtil.isDistantXYZ(position, corners.deepest_maxXmaxY)
-					||!PositionUtil.isDistantXYZ(position, corners.deepest_minXmaxY)) {
+				if(isSimpleDrillingCorner(position,corners,false)) {
 					//skip adding
 				}else{
 					newCode.add(action);
@@ -66,10 +63,7 @@ public class GCodeUtil {
 			ActionInterface action = ite.next();
 			if(action instanceof PositionXYZInterface) {
 				PositionXYZInterface position = (PositionXYZInterface)action;
-				if(!PositionUtil.isDistantXYZ(position, corners.deepest_minXminY)
-					||!PositionUtil.isDistantXYZ(position, corners.deepest_maxXminY)
-					||!PositionUtil.isDistantXYZ(position, corners.deepest_maxXmaxY)
-					||!PositionUtil.isDistantXYZ(position, corners.deepest_minXmaxY)) {
+				if(isSimpleDrillingCorner(position,corners,true)) {
 					position.setZ(deepCutHeight);
 					newCode.add((ActionInterface)position);
 				}else{
@@ -80,6 +74,19 @@ public class GCodeUtil {
 			}
 		}
 		return newCode;
+	}
+	private static boolean isSimpleDrillingCorner(PositionXYZInterface position, Deepest4Corners corners, boolean deepestOnly) {
+		return (isSimpleDrillingCorner(position,corners.corner_minXminY, deepestOnly)
+				||isSimpleDrillingCorner(position,corners.corner_maxXminY, deepestOnly)
+				||isSimpleDrillingCorner(position,corners.corner_maxXmaxY, deepestOnly)
+				||isSimpleDrillingCorner(position,corners.corner_minXmaxY, deepestOnly));
+	}
+	private static boolean isSimpleDrillingCorner(PositionXYZInterface position, CornerDrillingOperator corner, boolean deepestOnly) {
+		if(corner==null||!(corner instanceof SimpleDrilling))return false;
+		if(deepestOnly)
+			return !PositionUtil.isDistantXYZ(position, ((SimpleDrilling)corner).deepestPoint);
+		else
+			return !PositionUtil.isDistantXY(position, ((SimpleDrilling)corner).deepestPoint);
 	}
 	private static class Deepest4Corners {
 		
