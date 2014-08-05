@@ -2,6 +2,9 @@ package st.tori.cnc.stencil.gerber.statement;
 
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 
+/*
+ * Set quadrant mode to 'Single quadrant'
+ */
 public class GStatement74 extends GStatement {
 
 	@Override

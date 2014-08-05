@@ -2,6 +2,9 @@ package st.tori.cnc.stencil.gerber.statement;
 
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 
+/*
+ * Set region mode on
+ */
 public class GStatement36 extends GStatement {
 
 	@Override

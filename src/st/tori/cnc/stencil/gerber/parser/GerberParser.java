@@ -6,12 +6,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
-import st.tori.cnc.stencil.gerber.exception.InvalidIndexException;
-import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
+import st.tori.cnc.stencil.gerber.exception.GerberException;
+import st.tori.cnc.stencil.gerber.exception.IllegalParameterException;
 import st.tori.cnc.stencil.gerber.statement.Comment;
-import st.tori.cnc.stencil.gerber.statement.GStatement;
-import st.tori.cnc.stencil.gerber.statement.MStatement02;
 import st.tori.cnc.stencil.gerber.statement.StatementFactory;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.FileUtil;
@@ -22,16 +19,18 @@ public class GerberParser {
 	private static final Pattern PATTERN_COMMENT	 = Pattern.compile("^G04([^\\*]+)\\*$");
 	private static final Pattern PATTERN_SINGLE_G	 = Pattern.compile("^G([0-9]{2})(.*)\\*$");
 	private static final Pattern PATTERN_SINGLE_D	 = Pattern.compile("^D([0-9]{2})(.*)\\*$");
-	private static final Pattern PATTERN_SINGLE_ELSE = Pattern.compile("^%(.*)%");
+	private static final Pattern PATTERN_SINGLE_P	 = Pattern.compile("^%(..)(.*)$");
 
-	public Gerber parse(File file) throws InvalidIndexException, NoLastStatementExistsException, IllegalReflectionException {
+	public Gerber parse(File file) throws GerberException {
 		Gerber gerber = new Gerber();
-		GStatement statement = null;
+		StatementInterface statement = null;
 		String line;
 		List<String> list = FileUtil.readFileAsStringList(file);
 		Iterator<String> ite = list.iterator();
+		int lineIndex = 0;
 		while(ite.hasNext()) {
 			line = ite.next();
+			lineIndex++;
 			System.out.println(line);
 			line = line.trim();
 			Matcher matcher;
@@ -60,9 +59,22 @@ public class GerberParser {
 				System.out.println("PatternSingleD matched: D"+matcher.group(1)+":"+matcher.group(2));
 				continue;
 			}
-			matcher = PATTERN_SINGLE_ELSE.matcher(line);
+			matcher = PATTERN_SINGLE_P.matcher(line);
 			if(matcher.find()) {
-				System.out.println("PatternSingleElse matched: "+matcher.group(1));
+				String parameterCode = matcher.group(1);
+				String modifiers = matcher.group(2);
+				while(!modifiers.endsWith("%") && ite.hasNext()) {
+					modifiers += ite.next().trim();
+					lineIndex++;
+				}
+				if(!modifiers.endsWith("%"))
+					throw new IllegalParameterException(lineIndex, parameterCode);
+				else if("%".equals(modifiers))
+					modifiers = null;
+				else
+					modifiers = modifiers.substring(0,modifiers.length()-1);
+				System.out.println("PatternSingleP matched: "+parameterCode+":"+modifiers);
+				statement = StatementFactory.createPStatement(parameterCode, modifiers);
 				continue;
 			}
 			System.out.println("NOMATCH");

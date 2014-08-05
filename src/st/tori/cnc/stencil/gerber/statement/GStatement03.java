@@ -2,6 +2,9 @@ package st.tori.cnc.stencil.gerber.statement;
 
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 
+/*
+ * Set the interpolation mode to 'Counterclockwise circular interpolation'
+ */
 public class GStatement03 extends GStatement {
 
 	@Override

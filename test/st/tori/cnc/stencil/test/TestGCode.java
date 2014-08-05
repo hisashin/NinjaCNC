@@ -67,7 +67,7 @@ public class TestGCode {
 		TEST_SQUARE_CUT = buf.toString();
 	}
 
-	//@Test
+	@Test
 	public void testSquareCut() {
 		GCode code = new GCode(Drill.ORIMIN_VC);
 		code.initialize(5.0, 0.5, -0.15, 100.0, 300.0);
@@ -75,12 +75,12 @@ public class TestGCode {
 		code.finalize();
 		assertGCode(TEST_HEADER+TEST_SQUARE_CUT+TEST_FOOTER, code);
 	}
-	//@Test
+	@Test
 	public void testSimpleStencilWithSquareFromFile() {
 		assertGCode(FileUtil.readFileAsString(new File("gerber/Levistone_tcream.ncd")),
 				new GCodeSampleLevistoneTCream());
 	}
-	//@Test
+	@Test
 	public void testParser() {
 		try {
 			File file = new File("gerber/Levistone_tcream.ncd");
@@ -92,6 +92,7 @@ public class TestGCode {
 			fail(e.getMessage());
 		}
 	}
+	/*
 	@Test
 	public void testRemove4CornerHoles() {
 		try {
@@ -106,7 +107,7 @@ public class TestGCode {
 			fail(e.getMessage());
 		}
 	}
-	//@Test
+	@Test
 	public void testDeppDrilling4CornerHoles() {
 		try {
 			File file = new File("gerber/Levistone-cmp.ncd");
@@ -123,7 +124,7 @@ public class TestGCode {
 			fail(e.getMessage());
 		}
 	}
-	//@Test
+	@Test
 	public void testChangeDrillForOutline() {
 		try {
 			File file = new File("gerber/Levistone-sol-out.ncd");
@@ -136,7 +137,8 @@ public class TestGCode {
 			fail(e.getMessage());
 		}
 	}
-	//@Test
+	*/
+	@Test
 	public void testCreateGCodeForSolderStencil() {
 		try {
 			GerberParser gbParser = new GerberParser();

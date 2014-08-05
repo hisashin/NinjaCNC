@@ -2,6 +2,9 @@ package st.tori.cnc.stencil.gerber.statement;
 
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 
+/*
+ * Set quadrant mode to 'Multi quadrant'
+ */
 public class GStatement75 extends GStatement {
 
 	@Override

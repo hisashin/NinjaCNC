@@ -1,13 +1,13 @@
 package st.tori.cnc.stencil.gcode.action;
 
 import st.tori.cnc.stencil.gcode.exception.IllegalReflectionException;
-import st.tori.cnc.stencil.gcode.exception.InvalidIndexException;
+import st.tori.cnc.stencil.gcode.exception.UnsupportedIndexException;
 import st.tori.cnc.stencil.gcode.exception.NoLastActionExistsException;
 import st.tori.cnc.stencil.gcode.parser.GCode;
 
 public class ActionFactory {
 
-	public static GAction createGAction(int gIndex, GCode gCode) throws InvalidIndexException, NoLastActionExistsException, IllegalReflectionException {
+	public static GAction createGAction(int gIndex, GCode gCode) throws UnsupportedIndexException, NoLastActionExistsException, IllegalReflectionException {
 		GAction action;
 		if(gIndex<0) {
 			action = gCode.cloneLastAction();
@@ -29,14 +29,14 @@ public class ActionFactory {
 		else if(gIndex==90)
 			action = new GAction90(gCode);
 		else
-			throw new InvalidIndexException("G",gIndex);
+			throw new UnsupportedIndexException("G",gIndex);
 		return action;
 	}
 	
-	public static MAction createMAction(int mIndex) throws InvalidIndexException {
+	public static MAction createMAction(int mIndex) throws UnsupportedIndexException {
 		if(mIndex==3)return new MAction03();
 		if(mIndex==30)return new MAction30();
-		throw new InvalidIndexException("M",mIndex);
+		throw new UnsupportedIndexException("M",mIndex);
 	}
 
 }
