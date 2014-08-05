@@ -10,6 +10,7 @@ import st.tori.cnc.stencil.canvas.SimpleXY;
 import st.tori.cnc.stencil.canvas.applet.DimensionController;
 import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
+import st.tori.cnc.stencil.gerber.exception.NotYetFormatSpecifiedException;
 import st.tori.cnc.stencil.gerber.statement.GStatement;
 import st.tori.cnc.stencil.gerber.statement.GStatement02;
 import st.tori.cnc.stencil.gerber.statement.GStatement03;
@@ -17,7 +18,7 @@ import st.tori.cnc.stencil.gerber.statement.GStatement36;
 import st.tori.cnc.stencil.gerber.statement.GStatement37;
 import st.tori.cnc.stencil.gerber.statement.GStatement74;
 import st.tori.cnc.stencil.gerber.statement.GStatement75;
-import st.tori.cnc.stencil.gerber.statement.MStatement02;
+import st.tori.cnc.stencil.gerber.statement.PStatementFS;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
 
@@ -34,7 +35,6 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 	}
 	public final void finalize() {
 		if(!initialized)return;
-		add(new MStatement02());
 		finalized = true;
 	}
 		
@@ -65,6 +65,14 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		return buf.toString().replaceAll(RET+RET+"?", RET);
 	}
 	
+	public enum ZERO_OMISSION_MODE {
+		OMIT_LEADING_ZEROS,
+		OMIT_TRAILING_ZEROS,
+	}
+	public enum COORDINATE_VALUES_NOTATION {
+		ABSOLUTE_NOTATION,
+		INCREMENTAL_NOTATION,
+	}
 	public enum INTERPOLATION_MODE {
 		UNDEF,
 		LINER,
@@ -82,6 +90,32 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		MULTI,
 	}
 	
+	private ZERO_OMISSION_MODE zeroOmissionMode = null;
+	private COORDINATE_VALUES_NOTATION coordinateValuesNotation;
+	private int XN;
+	private int XM;
+	private int YN;
+	private int YM;
+
+	public double parseX(String strValue) throws NotYetFormatSpecifiedException {
+		return parse(strValue, XN, XM);
+	}
+	public double parseY(String strValue) throws NotYetFormatSpecifiedException {
+		return parse(strValue, YN, YM);
+	}
+	private double parse(String strValue, int n, int m) throws NotYetFormatSpecifiedException {
+		if(zeroOmissionMode==null) {
+			throw new NotYetFormatSpecifiedException();
+		}else if(zeroOmissionMode==ZERO_OMISSION_MODE.OMIT_LEADING_ZEROS) {
+			while(strValue.length()<n+m)
+				strValue = "0"+strValue;
+		}else if(zeroOmissionMode==ZERO_OMISSION_MODE.OMIT_TRAILING_ZEROS) {
+			while(strValue.length()<n+m)
+				strValue += "0";
+		}
+		return Double.parseDouble(strValue.substring(0,n))+Double.parseDouble("0."+strValue.substring(n));
+	}
+
 	private INTERPOLATION_MODE interpolation = INTERPOLATION_MODE.UNDEF;
 	private REGION_MODE region = REGION_MODE.UNDEF;
 	private QUADRANT_MODE quadrant = QUADRANT_MODE.UNDEF;
@@ -105,7 +139,15 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 	
 	@Override
 	public final boolean add(StatementInterface statement) {
-		if(statement instanceof GStatement02) {
+		if(statement instanceof PStatementFS) {
+			PStatementFS _statement = (PStatementFS)statement;
+			zeroOmissionMode = _statement.zeroOmissionMode;
+			coordinateValuesNotation = _statement.coordinateValuesNotation;
+			XN = _statement.XN;
+			XM = _statement.XM;
+			YN = _statement.YN;
+			YM = _statement.YM;
+		}else if(statement instanceof GStatement02) {
 			interpolation = INTERPOLATION_MODE.CLOCKWISE_CIRCULAR;
 		}else if(statement instanceof GStatement03) {
 			interpolation = INTERPOLATION_MODE.COUNTERCLOCKWISE_CIRCULAR;
