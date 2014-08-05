@@ -16,6 +16,8 @@ public class PStatementIP extends PStatement {
 
 	public PStatementIP(String modifiers, Gerber gerber) throws IllegalParameterModifiersException, UnsupportedPrefixException {
 		super(modifiers, gerber);
+		if(true)
+			throw new UnsupportedPrefixException(getParameterCode());
 		if(modifiers!=null) {
 			if(modifiers.startsWith("POS")) {
 				imagePolarity = IMAGE_POLARITY.POSITIVE;
@@ -25,8 +27,6 @@ public class PStatementIP extends PStatement {
 				//return;
 			}
 		}
-		if(true)
-			throw new UnsupportedPrefixException(getParameterCode());
 		throw new IllegalParameterModifiersException("Modifiers '"+modifiers+"' is illegal for "+getSimpleName());
 	}
 

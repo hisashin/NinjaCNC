@@ -20,6 +20,7 @@ import st.tori.cnc.stencil.gerber.statement.GStatement74;
 import st.tori.cnc.stencil.gerber.statement.GStatement75;
 import st.tori.cnc.stencil.gerber.statement.PStatementFS;
 import st.tori.cnc.stencil.gerber.statement.PStatementIP;
+import st.tori.cnc.stencil.gerber.statement.PStatementLP;
 import st.tori.cnc.stencil.gerber.statement.PStatementMO;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
@@ -129,6 +130,12 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 	private UNIT_MODE unitMode = null;
 	private IMAGE_POLARITY imagePolarity = null;
 	
+	private List<GerberLevel> levels = new ArrayList<GerberLevel>();
+	
+	protected GerberLevel getCurrentLevel() {
+		return levels.get(levels.size()-1);
+	}
+	
 	private INTERPOLATION_MODE interpolation = INTERPOLATION_MODE.UNDEF;
 	private REGION_MODE region = REGION_MODE.UNDEF;
 	private QUADRANT_MODE quadrant = QUADRANT_MODE.UNDEF;
@@ -164,6 +171,8 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			unitMode = ((PStatementMO)statement).unitMode;
 		}else if(statement instanceof PStatementIP) {
 			imagePolarity = ((PStatementIP)statement).imagePolarity;
+		}else if(statement instanceof PStatementLP) {
+			levels.add(new GerberLevel(((PStatementLP)statement).polarity));
 		}else if(statement instanceof GStatement02) {
 			interpolation = INTERPOLATION_MODE.CLOCKWISE_CIRCULAR;
 		}else if(statement instanceof GStatement03) {
