@@ -13,6 +13,8 @@ public class PStatementLP extends PStatement {
 
 	public PStatementLP(String modifiers, Gerber gerber) throws IllegalParameterModifiersException {
 		super(modifiers, gerber);
+		
+		throw new IllegalParameterModifiersException("Modifiers '"+modifiers+"' is illegal for "+getSimpleName());
 	}
 
 }

@@ -19,6 +19,8 @@ import st.tori.cnc.stencil.gerber.statement.GStatement37;
 import st.tori.cnc.stencil.gerber.statement.GStatement74;
 import st.tori.cnc.stencil.gerber.statement.GStatement75;
 import st.tori.cnc.stencil.gerber.statement.PStatementFS;
+import st.tori.cnc.stencil.gerber.statement.PStatementIP;
+import st.tori.cnc.stencil.gerber.statement.PStatementMO;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
 
@@ -69,6 +71,14 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		OMIT_LEADING_ZEROS,
 		OMIT_TRAILING_ZEROS,
 	}
+	public enum UNIT_MODE {
+		INCHES,
+		MILLIMETERS,
+	}
+	public enum IMAGE_POLARITY {
+		POSITIVE,
+		NEGATIVE,
+	}
 	public enum COORDINATE_VALUES_NOTATION {
 		ABSOLUTE_NOTATION,
 		INCREMENTAL_NOTATION,
@@ -96,7 +106,7 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 	private int XM;
 	private int YN;
 	private int YM;
-
+	
 	public double parseX(String strValue) throws NotYetFormatSpecifiedException {
 		return parse(strValue, XN, XM);
 	}
@@ -116,6 +126,9 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		return Double.parseDouble(strValue.substring(0,n))+Double.parseDouble("0."+strValue.substring(n));
 	}
 
+	private UNIT_MODE unitMode = null;
+	private IMAGE_POLARITY imagePolarity = null;
+	
 	private INTERPOLATION_MODE interpolation = INTERPOLATION_MODE.UNDEF;
 	private REGION_MODE region = REGION_MODE.UNDEF;
 	private QUADRANT_MODE quadrant = QUADRANT_MODE.UNDEF;
@@ -147,6 +160,10 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			XM = _statement.XM;
 			YN = _statement.YN;
 			YM = _statement.YM;
+		}else if(statement instanceof PStatementMO) {
+			unitMode = ((PStatementMO)statement).unitMode;
+		}else if(statement instanceof PStatementIP) {
+			imagePolarity = ((PStatementIP)statement).imagePolarity;
 		}else if(statement instanceof GStatement02) {
 			interpolation = INTERPOLATION_MODE.CLOCKWISE_CIRCULAR;
 		}else if(statement instanceof GStatement03) {
