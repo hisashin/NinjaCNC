@@ -1,5 +1,6 @@
 package st.tori.cnc.stencil.gerber.statement;
 
+import st.tori.cnc.stencil.gerber.exception.IllegalParameterModifiersException;
 import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
 import st.tori.cnc.stencil.gerber.exception.UnsupportedIndexException;
@@ -45,27 +46,21 @@ public class StatementFactory {
 		throw new UnsupportedIndexException("D",dIndex);
 	}
 
-	public static MStatement createMStatement(int mIndex) throws UnsupportedIndexException {
-		if(mIndex==2)
-			return new MStatement02();
-		throw new UnsupportedIndexException("M",mIndex);
-	}
-
-	public static PStatement createPStatement(String parameterCode, String modifiers) throws UnsupportedParameterCodeException {
+	public static PStatement createPStatement(String parameterCode, String modifiers, Gerber gerber) throws UnsupportedParameterCodeException, IllegalParameterModifiersException {
 		if("FS".equals(parameterCode))
-			return new PStatementFS(modifiers);
+			return new PStatementFS(modifiers, gerber);
 		else if("MO".equals(parameterCode))
-			return new PStatementMO(modifiers);
+			return new PStatementMO(modifiers, gerber);
 		else if("IP".equals(parameterCode))
-			return new PStatementIP(modifiers);
+			return new PStatementIP(modifiers, gerber);
 		else if("AD".equals(parameterCode))
-			return new PStatementAD(modifiers);
+			return new PStatementAD(modifiers, gerber);
 		else if("AM".equals(parameterCode))
-			return new PStatementAM(modifiers);
+			return new PStatementAM(modifiers, gerber);
 		else if("SR".equals(parameterCode))
-			return new PStatementSR(modifiers);
+			return new PStatementSR(modifiers, gerber);
 		else if("LP".equals(parameterCode))
-			return new PStatementLP(modifiers);
+			return new PStatementLP(modifiers, gerber);
 		throw new UnsupportedParameterCodeException(parameterCode,modifiers);
 	}
 

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import st.tori.cnc.stencil.gerber.exception.GerberException;
 import st.tori.cnc.stencil.gerber.exception.IllegalParameterException;
+import st.tori.cnc.stencil.gerber.exception.UnsupportedPrefixException;
 import st.tori.cnc.stencil.gerber.statement.Comment;
 import st.tori.cnc.stencil.gerber.statement.StatementFactory;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
@@ -57,6 +58,12 @@ public class GerberParser {
 			matcher = PATTERN_SINGLE_D.matcher(line);
 			if(matcher.find()) {
 				System.out.println("PatternSingleD matched: D"+matcher.group(1)+":"+matcher.group(2));
+				int dIndex = Integer.parseInt(matcher.group(1));
+				String param = matcher.group(2);
+				if(statement!=null){
+					gerber.add(statement);
+				}
+				statement = StatementFactory.createDStatement(dIndex,gerber);
 				continue;
 			}
 			matcher = PATTERN_SINGLE_P.matcher(line);
@@ -74,56 +81,17 @@ public class GerberParser {
 				else
 					modifiers = modifiers.substring(0,modifiers.length()-1);
 				System.out.println("PatternSingleP matched: "+parameterCode+":"+modifiers);
-				statement = StatementFactory.createPStatement(parameterCode, modifiers);
+				if(statement!=null){
+					gerber.add(statement);
+				}
+				statement = StatementFactory.createPStatement(parameterCode, modifiers, gerber);
 				continue;
 			}
-			System.out.println("NOMATCH");
-			continue;
-			/*
-			while(matcher.find()) {
-				String prefix = matcher.group(1);
-				String valStr = matcher.group(2);
-				double val = Double.valueOf(valStr);
-				if(valStr.indexOf(".")<0&&!"G".equals(prefix)&&!"M".equals(prefix))val /= 1000.0;
-				if("G".equals(prefix)) {
-					if(action!=null){
-						gCode.add(action);
-					}
-					action = ActionFactory.createGAction((int)val,gCode);
-				}else if("M".equals(prefix)) {
-					gCode.add(ActionFactory.createMAction((int)val));
-				}else if("X".equals(prefix)) {
-					if(action==null)action = ActionFactory.createGAction(-1,gCode);
-					if(action instanceof PositionXYZInterface)
-						((PositionXYZInterface)action).setX(val);
-					else
-						throw new PositionNotSupportedException(line);
-				}else if("Y".equals(prefix)) {
-					if(action==null)action = ActionFactory.createGAction(-1,gCode);
-					if(action instanceof PositionXYZInterface)
-						((PositionXYZInterface)action).setY(val);
-					else
-						throw new PositionNotSupportedException(line);
-				}else if("Z".equals(prefix)) {
-					if(action==null)action = ActionFactory.createGAction(-1,gCode);
-					if(action instanceof PositionXYZInterface)
-						((PositionXYZInterface)action).setZ(val);
-					else
-						throw new PositionNotSupportedException(line);
-				}else if("F".equals(prefix)) {
-					if(action==null)action = ActionFactory.createGAction(-1,gCode);
-					if(action instanceof SpeedInterface)
-						((SpeedInterface)action).setF(val);
-					else
-						throw new SpeedNotSupportedException(line);
-				}else{
-					throw new UnsupportedPrefixException(prefix);
-				}
-			}
-			if(action!=null)gCode.add(action);
-			*/
-			//statement = null;
+			throw new UnsupportedPrefixException(line);
 		}
+		if(statement!=null)gerber.add(statement);
+		statement = null;
+		
 		System.out.println("There are "+list.size()+" lines,"+gerber.size()+" statements");
 		return gerber;
 	}
