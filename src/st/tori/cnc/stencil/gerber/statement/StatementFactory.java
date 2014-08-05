@@ -10,58 +10,64 @@ import st.tori.cnc.stencil.gerber.parser.Gerber;
 public class StatementFactory {
 
 	public static GStatement createGStatement(int gIndex, Gerber gerber) throws UnsupportedIndexException, NoLastStatementExistsException, IllegalReflectionException {
-		GStatement action;
+		GStatement statement = null;
 		if(gIndex<0)
-			action = gerber.cloneLastStatement();
+			statement = gerber.cloneLastStatement();
 		else if(gIndex==1)
-			action = new GStatement01(gerber);
+			statement = new GStatement01(gerber);
 		else if(gIndex==2)
-			action = new GStatement02(gerber);
+			statement = new GStatement02(gerber);
 		else if(gIndex==3)
-			action = new GStatement03(gerber);
+			statement = new GStatement03(gerber);
 		else if(gIndex==4)
-			action = new GStatement04(gerber);
+			statement = new GStatement04(gerber);
 		else if(gIndex==36)
-			action = new GStatement36(gerber);
+			statement = new GStatement36(gerber);
 		else if(gIndex==37)
-			action = new GStatement37(gerber);
+			statement = new GStatement37(gerber);
 		else if(gIndex==74)
-			action = new GStatement74(gerber);
+			statement = new GStatement74(gerber);
 		else if(gIndex==75)
-			action = new GStatement75(gerber);
-		else
+			statement = new GStatement75(gerber);
+		if(statement==null || statement instanceof UnsupportedStatementInterface)
 			throw new UnsupportedIndexException("G",gIndex);
-		return action;
+		return statement;
 	}
 	
 	public static DStatement createDStatement(int dIndex, Gerber gerber) throws UnsupportedIndexException {
+		DStatement statement = null;
 		if(dIndex==1)
-			return new DStatement01(gerber);
+			statement = new DStatement01(gerber);
 		else if(dIndex==2)
-			return new DStatement02(gerber);
+			statement = new DStatement02(gerber);
 		else if(dIndex==3)
-			return new DStatement03(gerber);
+			statement = new DStatement03(gerber);
 		else if(dIndex>=10)
-			return new DStatement10orHigher(gerber);
-		throw new UnsupportedIndexException("D",dIndex);
+			statement = new DStatement10orHigher(gerber);
+		if(statement==null || statement instanceof UnsupportedStatementInterface)
+			throw new UnsupportedIndexException("D",dIndex);
+		return statement;
 	}
 
 	public static PStatement createPStatement(String parameterCode, String modifiers, Gerber gerber) throws UnsupportedParameterCodeException, IllegalParameterModifiersException {
+		PStatement statement = null;
 		if("FS".equals(parameterCode))
-			return new PStatementFS(modifiers, gerber);
+			statement = new PStatementFS(modifiers, gerber);
 		else if("MO".equals(parameterCode))
-			return new PStatementMO(modifiers, gerber);
+			statement = new PStatementMO(modifiers, gerber);
 		else if("IP".equals(parameterCode))
-			return new PStatementIP(modifiers, gerber);
+			statement = new PStatementIP(modifiers, gerber);
 		else if("AD".equals(parameterCode))
-			return new PStatementAD(modifiers, gerber);
+			statement = new PStatementAD(modifiers, gerber);
 		else if("AM".equals(parameterCode))
-			return new PStatementAM(modifiers, gerber);
+			statement = new PStatementAM(modifiers, gerber);
 		else if("SR".equals(parameterCode))
-			return new PStatementSR(modifiers, gerber);
+			statement = new PStatementSR(modifiers, gerber);
 		else if("LP".equals(parameterCode))
-			return new PStatementLP(modifiers, gerber);
-		throw new UnsupportedParameterCodeException(parameterCode,modifiers);
+			statement = new PStatementLP(modifiers, gerber);
+		if(statement==null || statement instanceof UnsupportedStatementInterface)
+			throw new UnsupportedParameterCodeException(parameterCode,modifiers);
+		return statement;
 	}
 
 }
