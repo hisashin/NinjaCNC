@@ -16,7 +16,7 @@ public class PStatementFS extends PStatement {
 	@Override
 	protected String getParameterCode() {	return "FS";	}
 
-	private static final Pattern PATTERN_MODIFIERS = Pattern.compile("([LT])([AI])X([0-9])([0-9])Y([0-9])([0-9])\\*");
+	private static final Pattern PATTERN_MODIFIERS = Pattern.compile("([LT])([AI])X([0-9])([0-9])Y([0-9])([0-9])");
 	public PStatementFS(String modifiers, Gerber gerber) throws IllegalParameterModifiersException {
 		super(modifiers,gerber);
 		Matcher matcher = PATTERN_MODIFIERS.matcher(modifiers);

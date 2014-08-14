@@ -17,10 +17,11 @@ import st.tori.cnc.stencil.util.FileUtil;
 
 public class GerberParser {
 
-	private static final Pattern PATTERN_COMMENT	 = Pattern.compile("^G04([^\\*]+)\\*$");
-	private static final Pattern PATTERN_SINGLE_G	 = Pattern.compile("^G([0-9]{2})(.*)\\*$");
-	private static final Pattern PATTERN_SINGLE_D	 = Pattern.compile("^D([0-9]{2})(.*)\\*$");
-	private static final Pattern PATTERN_SINGLE_P	 = Pattern.compile("^%(..)(.*)$");
+	private static final Pattern PATTERN_COMMENT					 = Pattern.compile("^G04([^\\*]+)\\*$");
+	private static final Pattern PATTERN_SINGLE_G					 = Pattern.compile("^G([0-9]{2})(.*)\\*$");
+	private static final Pattern PATTERN_SINGLE_D					 = Pattern.compile("^D([0-9]{2})(.*)\\*$");
+	private static final Pattern PATTERN_SINGLE_APERTURE			 = Pattern.compile("^%ADD([0-9]+)([A-Z])(,(.*))?\\*%");
+	private static final Pattern PATTERN_SINGLE_P					 = Pattern.compile("^%(..)(.*)$");
 
 	public Gerber parse(File file) throws GerberException {
 		Gerber gerber = new Gerber();
@@ -66,6 +67,18 @@ public class GerberParser {
 				statement = StatementFactory.createDStatement(dIndex,gerber);
 				continue;
 			}
+			matcher = PATTERN_SINGLE_APERTURE.matcher(line);
+			if(matcher.find()) {
+				System.out.println("PatternSingleAperture matched: D"+matcher.group(1)+":"+matcher.group(2));
+				int dcode = Integer.parseInt(matcher.group(1));
+				String type = matcher.group(2);
+				String modifiersStr = matcher.group(4);
+				if(statement!=null){
+					gerber.add(statement);
+				}
+				statement = StatementFactory.createAperture(dcode, type, modifiersStr, gerber);
+				continue;
+			}
 			matcher = PATTERN_SINGLE_P.matcher(line);
 			if(matcher.find()) {
 				String parameterCode = matcher.group(1);
@@ -74,12 +87,12 @@ public class GerberParser {
 					modifiers += ite.next().trim();
 					lineIndex++;
 				}
-				if(!modifiers.endsWith("%"))
+				if(!modifiers.endsWith("*%"))
 					throw new IllegalParameterException(lineIndex, parameterCode);
-				else if("%".equals(modifiers))
+				else if("*%".equals(modifiers))
 					modifiers = null;
 				else
-					modifiers = modifiers.substring(0,modifiers.length()-1);
+					modifiers = modifiers.substring(0,modifiers.length()-2);
 				System.out.println("PatternSingleP matched: "+parameterCode+":"+modifiers);
 				if(statement!=null){
 					gerber.add(statement);

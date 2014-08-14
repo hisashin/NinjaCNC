@@ -238,5 +238,10 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 	public final boolean add(Drawable drawable) {
 		return drawables.add(drawable);
 	}
+	
+	public Object getMacro(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

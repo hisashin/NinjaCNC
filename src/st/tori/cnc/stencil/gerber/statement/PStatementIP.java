@@ -7,7 +7,7 @@ import st.tori.cnc.stencil.gerber.parser.Gerber.IMAGE_POLARITY;
 /*
  * Image Polarity
  */
-public class PStatementIP extends PStatement implements UnsupportedStatementInterface {
+public class PStatementIP extends PStatement {
 
 	@Override
 	protected String getParameterCode() {	return "IP";	}

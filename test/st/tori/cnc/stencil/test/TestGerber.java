@@ -34,7 +34,8 @@ public class TestGerber {
 	@Test
 	public void testParser() {
 		try {
-			File file = new File("gerber/Test.gbr");
+			//File file = new File("gerber/Test.gbr");
+			File file = new File("gerber/harpyx/HARPYX_140622.GTS");
 			GerberParser gbParser = new GerberParser();
 			Gerber codeGerber = gbParser.parse(file);
 			assertGerber(FileUtil.readFileAsString(file), codeGerber);
