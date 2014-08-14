@@ -1,6 +1,6 @@
-package st.tori.cnc.stencil.gerber.aperture;
+package st.tori.cnc.stencil.gerber.statement.aperture;
 
-import st.tori.cnc.stencil.gerber.aperture.modifier.ApertureModifier;
+import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 
 

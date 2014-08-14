@@ -1,4 +1,4 @@
-package st.tori.cnc.stencil.gerber.aperture.modifier;
+package st.tori.cnc.stencil.gerber.statement.aperture.modifier;
 
 
 public class ApertureModifierRectanglar implements ApertureModifier {

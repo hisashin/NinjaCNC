@@ -1,4 +1,4 @@
-package st.tori.cnc.stencil.gerber.aperture;
+package st.tori.cnc.stencil.gerber.statement.aperture;
 
 import st.tori.cnc.stencil.gerber.exception.ApertureMacroNotDefinedException;
 import st.tori.cnc.stencil.gerber.parser.Gerber;

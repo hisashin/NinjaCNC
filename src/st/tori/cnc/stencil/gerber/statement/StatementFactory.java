@@ -2,16 +2,16 @@ package st.tori.cnc.stencil.gerber.statement;
 
 import java.util.ArrayList;
 
-import st.tori.cnc.stencil.gerber.aperture.GerberAperture;
-import st.tori.cnc.stencil.gerber.aperture.GerberApertureCircle;
-import st.tori.cnc.stencil.gerber.aperture.GerberApertureMacro;
-import st.tori.cnc.stencil.gerber.aperture.GerberApertureObround;
-import st.tori.cnc.stencil.gerber.aperture.GerberApertureRectangle;
-import st.tori.cnc.stencil.gerber.aperture.GerberApertureRegularPolygon;
-import st.tori.cnc.stencil.gerber.aperture.UnsupportedApertureInterface;
-import st.tori.cnc.stencil.gerber.aperture.modifier.ApertureModifier;
-import st.tori.cnc.stencil.gerber.aperture.modifier.ApertureModifierHole;
-import st.tori.cnc.stencil.gerber.aperture.modifier.ApertureModifierRectanglar;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberAperture;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberApertureCircle;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberApertureMacro;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberApertureObround;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberApertureRectangle;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberApertureRegularPolygon;
+import st.tori.cnc.stencil.gerber.statement.aperture.UnsupportedApertureInterface;
+import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
+import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifierHole;
+import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifierRectanglar;
 import st.tori.cnc.stencil.gerber.exception.ApertureMacroNotDefinedException;
 import st.tori.cnc.stencil.gerber.exception.ArithmeticExpressionUnsupportedException;
 import st.tori.cnc.stencil.gerber.exception.IllegalParameterModifiersException;
@@ -95,25 +95,26 @@ public class StatementFactory {
 
 	public static GerberAperture createAperture(int dcode, String type, String modifiersStr, Gerber gerber) throws UnsupportedApertureException, ApertureMacroNotDefinedException {
 		GerberAperture aperture = null;
-		ModifiersContainer container = new ModifiersContainer(modifiersStr);
+		ModifiersContainer container = new ModifiersContainer("X", modifiersStr);
 		if("C".equals(type))
-			aperture = new GerberApertureCircle(dcode, container.getAsDouble(0), container.getModifier(1), gerber);
+			aperture = new GerberApertureCircle(dcode, container.getAsDouble(0), container.getApertureModifier(1), gerber);
 		else if("R".equals(type))
-			aperture = new GerberApertureRectangle(dcode, container.getAsDouble(0), container.getAsDouble(1), container.getModifier(2), gerber);
+			aperture = new GerberApertureRectangle(dcode, container.getAsDouble(0), container.getAsDouble(1), container.getApertureModifier(2), gerber);
 		else if("O".equals(type))
-			aperture = new GerberApertureObround(dcode, container.getAsDouble(0), container.getAsDouble(1), container.getModifier(2), gerber);
+			aperture = new GerberApertureObround(dcode, container.getAsDouble(0), container.getAsDouble(1), container.getApertureModifier(2), gerber);
 		else if("P".equals(type))
-			aperture = new GerberApertureRegularPolygon(dcode, container.getAsDouble(0), container.getAsInt(1), container.getAsDouble(2), container.getModifier(3), gerber);
+			aperture = new GerberApertureRegularPolygon(dcode, container.getAsDouble(0), container.getAsInt(1), container.getAsDouble(2), container.getApertureModifier(3), gerber);
 		else
 			aperture = new GerberApertureMacro(dcode, type, gerber);
 		if(aperture==null || aperture instanceof UnsupportedApertureInterface)
 			throw new UnsupportedApertureException(dcode, type, modifiersStr);
 		return aperture;
 	}
-	private static class ModifiersContainer extends ArrayList<String> {
+	
+	public static class ModifiersContainer extends ArrayList<String> {
 		
-		public ModifiersContainer(String modifiersStr) {
-			String[] array = modifiersStr.split("X");
+		public ModifiersContainer(String sep, String modifiersStr) {
+			String[] array = modifiersStr.split(sep);
 			for(String val:array)
 				add(val);
 		}
@@ -125,14 +126,14 @@ public class StatementFactory {
 			return (size()<index)?null:Integer.parseInt(get(index));
 		}
 		
-		public ApertureModifier getModifier(int index) {
+		public ApertureModifier getApertureModifier(int index) {
 			if(index>=size())return null;
 			if(index+1==size())
 				return new ApertureModifierHole(parseDouble(get(index)));
 			return new ApertureModifierRectanglar(parseDouble(get(index)),parseDouble(get(index+1)));
 		}
 	}
-	private static double parseDouble(String val) {
+	public static double parseDouble(String val) {
 		if(val.startsWith("."))val = "0" + val;
 		return Double.parseDouble(val);
 	}
