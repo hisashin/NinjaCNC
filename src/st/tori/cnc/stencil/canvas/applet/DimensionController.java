@@ -8,6 +8,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
+import st.tori.cnc.stencil.canvas.shape.Circle;
+import st.tori.cnc.stencil.canvas.shape.Polyline;
+import st.tori.cnc.stencil.canvas.shape.Rectangle;
 
 public class DimensionController {
 
@@ -48,8 +51,10 @@ public class DimensionController {
 		}
 	}
 	
-	public void drawPolyline(PositionXYInterface[] xyArray, float stroke) {
+	public void drawPolyline(Polyline obj) {
+		PositionXYInterface[] xyArray = obj.getXYArray();
 		if(xyArray==null||xyArray.length<=1)return;
+		float stroke = obj.getStroke();
 		if(stroke>0)
 			((Graphics2D)graphics).setStroke(new BasicStroke((float)(stroke*ratio)));
 		PositionXYInterface lastPosition = xyArray[0];
@@ -59,6 +64,19 @@ public class DimensionController {
 			lastPosition = xyArray[i];
 		}
 	}
+	public void drawCircle(Circle obj) {
+		PositionXYInterface origin = obj.getOrigin();
+		double diameter = obj.getDiameter();
+		graphics.fillOval(getXtoShow(origin.getX()-diameter/2),getYtoShow(origin.getY()+diameter/2), getXtoShow(diameter), getYtoShow(diameter));
+	}
+	public void drawRectangle(Rectangle obj) {
+		PositionXYInterface lowerLeftOrigin = obj.getLowerLeftOrigin();
+		double width = obj.getWidth();
+		double height = obj.getHeight();
+		double rotationAngleInDeg = obj.getRotationAngleInDeg();
+		graphics.fillRect(getXtoShow(lowerLeftOrigin.getX()),getYtoShow(lowerLeftOrigin.getY()), getXtoShow(width), getYtoShow(height));
+	}
+	
 	private int getXtoShow(double x) {
 		return (int)(xMergin + (x - xyMinMax[0].getX())*ratio);
 	}

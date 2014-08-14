@@ -17,6 +17,8 @@ public class Polyline implements Drawable {
 	}
 	
 	public PositionXYInterface[] getXYArray(){	return xyArray;	}
+	public float getStroke(){	return stroke;	}
+	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {
 		if(xyArray==null||xyArray.length<=0)return null;
@@ -39,6 +41,6 @@ public class Polyline implements Drawable {
 
 	@Override
 	public void draw(DimensionController dc) {
-		dc.drawPolyline(xyArray, stroke);
+		dc.drawPolyline(this);
 	}
 }

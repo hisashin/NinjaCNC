@@ -1,11 +1,17 @@
 package st.tori.cnc.stencil.gerber.statement.aperture;
 
+import java.util.Collection;
+
+import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
-import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
+import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
 
 public abstract class GerberAperture implements StatementInterface {
+
+	public abstract Collection<Drawable> createDrawableCollection(PositionXYInterface origin);
+	public abstract float getStroke(PositionXYInterface lastPosition, PositionXYInterface position);
 
 	protected int dcode;
 	protected ApertureModifier modifier;
@@ -27,4 +33,5 @@ public abstract class GerberAperture implements StatementInterface {
 	public int getDcode(){	return dcode;	}
 	public ApertureModifier getModifier(){	return modifier;	}
 	
+		
 }

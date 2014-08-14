@@ -1,5 +1,6 @@
 package st.tori.cnc.stencil.gerber.statement.aperture;
 
+import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 
@@ -26,5 +27,10 @@ public class GerberApertureRegularPolygon extends GerberAperture {
 		return "%ADD"+dcode+",P";
 	}
 
+
+	@Override
+	public float getStroke(PositionXYInterface lastPosition, PositionXYInterface position) {
+		return (float)outerDiameter;
+	}
 
 }

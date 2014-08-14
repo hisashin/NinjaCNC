@@ -1,7 +1,7 @@
 package st.tori.cnc.stencil.gerber.statement.aperture;
 
-import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.aperture.modifier.ApertureModifier;
 
 
 public class GerberApertureObround extends GerberApertureRectangle {

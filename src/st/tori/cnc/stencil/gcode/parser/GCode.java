@@ -254,7 +254,6 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 			if(lastPosition!=null && PositionUtil.isCutting(lastPosition, (PositionXYZInterface)action)) {
 				drawables.add(new Line(lastPosition, (PositionXYInterface)action,
 						drill.getDiameter(-((PositionXYZInterface)action).getZ())));
-				
 			}
 			lastPosition = (PositionXYZInterface)action;
 		}
@@ -270,7 +269,6 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		while(ite.hasNext())
 			ite.next().draw(dc);
 	}
-	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {
 		if(drawables.size()<=0)return null;
@@ -293,9 +291,6 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		};
 	}
 	
-	public final boolean add(Drawable drawable) {
-		return drawables.add(drawable);
-	}
 	public final boolean add(Polygon polygon) {
 		PositionXYInterface[] array = polygon.getXYArray();
 		{

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import st.tori.cnc.stencil.canvas.Drawable;
+import st.tori.cnc.stencil.canvas.DrawableCollection;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
 import st.tori.cnc.stencil.canvas.applet.DimensionController;
@@ -218,6 +219,8 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			lastStatement = (GStatement)statement;
 		if(statement instanceof PositionXYInterface)
 			lastPosition = (PositionXYInterface)statement;
+		if(statement instanceof DrawableCollection)
+			drawables.addAll(((DrawableCollection)statement).getDrawables());
 		return super.add(statement);
 	}
 	
@@ -228,7 +231,6 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		while(ite.hasNext())
 			ite.next().draw(dc);
 	}
-	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {
 		if(drawables.size()<=0)return null;
@@ -249,10 +251,6 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			new SimpleXY(minX.getX(), minY.getY()),
 			new SimpleXY(maxX.getX(), maxY.getY()),
 		};
-	}
-	
-	public final boolean add(Drawable drawable) {
-		return drawables.add(drawable);
 	}
 	
 	private Map<Integer, GerberAperture> APERTURE_MAP = new HashMap<Integer, GerberAperture>();
