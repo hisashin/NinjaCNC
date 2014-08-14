@@ -19,7 +19,8 @@ public class GerberParser {
 
 	private static final Pattern PATTERN_COMMENT					 = Pattern.compile("^G04([^\\*]+)\\*$");
 	private static final Pattern PATTERN_SINGLE_G					 = Pattern.compile("^G([0-9]{2})(.*)\\*$");
-	private static final Pattern PATTERN_SINGLE_D					 = Pattern.compile("^D([0-9]{2})(.*)\\*$");
+	private static final Pattern PATTERN_SINGLE_D_PREFIX			 = Pattern.compile("^D([0-9]{2})\\*$");
+	private static final Pattern PATTERN_SINGLE_D_SUFFIX			 = Pattern.compile("^(.*)D([0-9]{2})\\*$");
 	private static final Pattern PATTERN_SINGLE_APERTURE			 = Pattern.compile("^%ADD([0-9]+)([A-Z])(,(.*))?\\*%");
 	private static final Pattern PATTERN_SINGLE_P					 = Pattern.compile("^%(..)(.*)$");
 
@@ -56,15 +57,25 @@ public class GerberParser {
 				statement = StatementFactory.createGStatement(gIndex,gerber);
 				continue;
 			}
-			matcher = PATTERN_SINGLE_D.matcher(line);
+			matcher = PATTERN_SINGLE_D_PREFIX.matcher(line);
 			if(matcher.find()) {
-				System.out.println("PatternSingleD matched: D"+matcher.group(1)+":"+matcher.group(2));
+				System.out.println("PatternSingleDprefix matched: D"+matcher.group(1));
 				int dIndex = Integer.parseInt(matcher.group(1));
-				String param = matcher.group(2);
 				if(statement!=null){
 					gerber.add(statement);
 				}
-				statement = StatementFactory.createDStatement(dIndex,gerber);
+				gerber.setCurrentAperture(gerber.getAperture(dIndex));
+				continue;
+			}
+			matcher = PATTERN_SINGLE_D_SUFFIX.matcher(line);
+			if(matcher.find()) {
+				System.out.println("PatternSingleDsuffix matched: D"+matcher.group(2)+":"+matcher.group(1));
+				int dIndex = Integer.parseInt(matcher.group(2));
+				String positionStr = matcher.group(1);
+				if(statement!=null){
+					gerber.add(statement);
+				}
+				statement = StatementFactory.createDStatement(dIndex,positionStr,gerber);
 				continue;
 			}
 			matcher = PATTERN_SINGLE_APERTURE.matcher(line);

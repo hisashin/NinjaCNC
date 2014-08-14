@@ -1,17 +1,18 @@
 package st.tori.cnc.stencil.gerber.statement.macro;
 
-import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionDouble;
+
 
 public class GerberMacroVectorLine extends GerberMacro {
 
-	protected double lineWidth;
-	protected double xStart;
-	protected double yStart;
-	protected double xEnd;
-	protected double yEnd;
+	protected ArithmeticExpressionDouble lineWidth;
+	protected ArithmeticExpressionDouble xStart;
+	protected ArithmeticExpressionDouble yStart;
+	protected ArithmeticExpressionDouble xEnd;
+	protected ArithmeticExpressionDouble yEnd;
 	
-	public GerberMacroVectorLine(int exposure, double lineWidth, double xStart, double yStart, double xEnd, double yEnd, double rotationAngle, Gerber gerber) {
-		super(exposure, rotationAngle, gerber);
+	public GerberMacroVectorLine(int exposure, ArithmeticExpressionDouble lineWidth, ArithmeticExpressionDouble xStart, ArithmeticExpressionDouble yStart, ArithmeticExpressionDouble xEnd, ArithmeticExpressionDouble yEnd, ArithmeticExpressionDouble rotationAngle) {
+		super(exposure, rotationAngle);
 		this.lineWidth = lineWidth;
 		this.xStart = xStart;
 		this.yStart = yStart;
@@ -19,10 +20,10 @@ public class GerberMacroVectorLine extends GerberMacro {
 		this.yEnd = yEnd;
 	}
 	
-	public double getLineWidth(){	return lineWidth;	}
-	public double getXStart(){	return xStart;	}
-	public double getYStart(){	return yStart;	}
-	public double getXEnd(){	return xEnd;	}
-	public double getYEnd(){	return yEnd;	}
+	public ArithmeticExpressionDouble getLineWidth(){	return lineWidth;	}
+	public ArithmeticExpressionDouble getXStart(){	return xStart;	}
+	public ArithmeticExpressionDouble getYStart(){	return yStart;	}
+	public ArithmeticExpressionDouble getXEnd(){	return xEnd;	}
+	public ArithmeticExpressionDouble getYEnd(){	return yEnd;	}
 	
 }

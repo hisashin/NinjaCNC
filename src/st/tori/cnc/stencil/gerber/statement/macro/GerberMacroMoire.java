@@ -1,20 +1,22 @@
 package st.tori.cnc.stencil.gerber.statement.macro;
 
-import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionDouble;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionInt;
+
 
 public class GerberMacroMoire extends GerberMacro {
 
-	protected double x;
-	protected double y;
-	protected double outerDiameter;
-	protected double thickness;
-	protected double gap;
-	protected int maximumNumberOfRings;
-	protected double crossHairThickness;
-	protected double crossHairLength;
+	protected ArithmeticExpressionDouble x;
+	protected ArithmeticExpressionDouble y;
+	protected ArithmeticExpressionDouble outerDiameter;
+	protected ArithmeticExpressionDouble thickness;
+	protected ArithmeticExpressionDouble gap;
+	protected ArithmeticExpressionInt maximumNumberOfRings;
+	protected ArithmeticExpressionDouble crossHairThickness;
+	protected ArithmeticExpressionDouble crossHairLength;
 	
-	public GerberMacroMoire(int exposure, double x, double y, double outerDiameter, double thickness, double gap, int maximumNumberOfRings, double crossHairThickness, double crossHairLength, double rotationAngle, Gerber gerber) {
-		super(exposure, rotationAngle, gerber);
+	public GerberMacroMoire(ArithmeticExpressionDouble x, ArithmeticExpressionDouble y, ArithmeticExpressionDouble outerDiameter, ArithmeticExpressionDouble thickness, ArithmeticExpressionDouble gap, ArithmeticExpressionInt maximumNumberOfRings, ArithmeticExpressionDouble crossHairThickness, ArithmeticExpressionDouble crossHairLength, ArithmeticExpressionDouble rotationAngle) {
+		super(1, rotationAngle);
 		this.x = x;
 		this.y = y;
 		this.outerDiameter = outerDiameter;
@@ -25,13 +27,13 @@ public class GerberMacroMoire extends GerberMacro {
 		this.crossHairLength = crossHairLength;
 	}
 	
-	public double getX(){	return x;	}
-	public double getY(){	return y;	}
-	public double getOuterDiameter(){	return outerDiameter;	}
-	public double getThickness(){	return thickness;	}
-	public double getGap(){	return gap;	}
-	public int getMaximumNumberOfRings(){	return maximumNumberOfRings;	}
-	public double getCrossHairThickness(){	return crossHairThickness;	}
-	public double getCrossHairkLength(){	return crossHairLength;	}
+	public ArithmeticExpressionDouble getX(){	return x;	}
+	public ArithmeticExpressionDouble getY(){	return y;	}
+	public ArithmeticExpressionDouble getOuterDiameter(){	return outerDiameter;	}
+	public ArithmeticExpressionDouble getThickness(){	return thickness;	}
+	public ArithmeticExpressionDouble getGap(){	return gap;	}
+	public ArithmeticExpressionInt getMaximumNumberOfRings(){	return maximumNumberOfRings;	}
+	public ArithmeticExpressionDouble getCrossHairThickness(){	return crossHairThickness;	}
+	public ArithmeticExpressionDouble getCrossHairkLength(){	return crossHairLength;	}
 	
 }

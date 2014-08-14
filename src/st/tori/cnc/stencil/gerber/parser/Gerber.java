@@ -1,17 +1,23 @@
 package st.tori.cnc.stencil.gerber.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
 import st.tori.cnc.stencil.canvas.applet.DimensionController;
+import st.tori.cnc.stencil.gerber.exception.ApertureMacroNotDefinedException;
+import st.tori.cnc.stencil.gerber.exception.ApertureNotDefinedException;
 import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
 import st.tori.cnc.stencil.gerber.exception.NotYetFormatSpecifiedException;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberAperture;
+import st.tori.cnc.stencil.gerber.statement.function.DStatement10orHigher;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement02;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement03;
@@ -19,6 +25,8 @@ import st.tori.cnc.stencil.gerber.statement.function.GStatement36;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement37;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement74;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement75;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacro;
+import st.tori.cnc.stencil.gerber.statement.parameter.PStatementAM;
 import st.tori.cnc.stencil.gerber.statement.parameter.PStatementFS;
 import st.tori.cnc.stencil.gerber.statement.parameter.PStatementIP;
 import st.tori.cnc.stencil.gerber.statement.parameter.PStatementLP;
@@ -185,6 +193,12 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			yRepeats = _statement.yRepeats;
 			xStep = _statement.xStep;
 			yStep = _statement.yStep;
+		}else if(statement instanceof PStatementAM) {
+			PStatementAM _statement = (PStatementAM)statement;
+			setMacros(_statement.getName(), _statement.getMacros());
+		}else if(statement instanceof GerberAperture) {
+			GerberAperture _statement = (GerberAperture)statement;
+			setAperture(_statement.getDcode(), _statement);
 		}else if(statement instanceof GStatement02) {
 			interpolation = INTERPOLATION_MODE.CLOCKWISE_CIRCULAR;
 		}else if(statement instanceof GStatement03) {
@@ -197,6 +211,8 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			quadrant = QUADRANT_MODE.SINGLE;
 		}else if(statement instanceof GStatement75) {
 			quadrant = QUADRANT_MODE.MULTI;
+		}else if(statement instanceof DStatement10orHigher) {
+			setCurrentAperture(((DStatement10orHigher)statement).getAperture());
 		}
 		if(statement instanceof GStatement)
 			lastStatement = (GStatement)statement;
@@ -239,9 +255,37 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		return drawables.add(drawable);
 	}
 	
-	public Object getMacro(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	private Map<Integer, GerberAperture> APERTURE_MAP = new HashMap<Integer, GerberAperture>();
+	
+	private void setAperture(int dcode, GerberAperture aperture) {
+		APERTURE_MAP.put(dcode, aperture);
+	}
+	public GerberAperture getAperture(int dcode) throws ApertureNotDefinedException {
+		GerberAperture aperture = APERTURE_MAP.get(dcode);
+		if(aperture==null)
+			throw new ApertureNotDefinedException(dcode);
+		return aperture;
+	}
+	
+	private GerberAperture currentAperture = null;
+	
+	public void setCurrentAperture(GerberAperture aperture) {
+		this.currentAperture = aperture;
+	}
+	public GerberAperture getCurrentAperture() {
+		return currentAperture;
+	}
+	
+	private Map<String, List<GerberMacro>> MACROS_MAP = new HashMap<String, List<GerberMacro>>();
+	
+	private void setMacros(String name, List<GerberMacro> macros) {
+		MACROS_MAP.put(name, macros);
+	}
+	public List<GerberMacro> getMacros(String name) throws ApertureMacroNotDefinedException {
+		List<GerberMacro> macros = MACROS_MAP.get(name);
+		if(macros==null)
+			throw new ApertureMacroNotDefinedException(name);
+		return macros;
 	}
 
 }

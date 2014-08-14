@@ -1,21 +1,22 @@
 package st.tori.cnc.stencil.gerber.statement.macro;
 
-import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionDouble;
+
 
 public class GerberMacroCircle extends GerberMacro {
 
-	protected double diameter;
-	protected double x;
-	protected double y;
+	protected ArithmeticExpressionDouble diameter;
+	protected ArithmeticExpressionDouble x;
+	protected ArithmeticExpressionDouble y;
 	
-	public GerberMacroCircle(int exposure, double diameter, double x, double y, Gerber gerber) {
-		super(exposure, 0.0, gerber);
+	public GerberMacroCircle(int exposure, ArithmeticExpressionDouble diameter, ArithmeticExpressionDouble x, ArithmeticExpressionDouble y) {
+		super(exposure, new ArithmeticExpressionDouble("0.0"));
 		this.diameter = diameter;
 		this.x = x;
 		this.y = y;
 	}
 	
-	public double getX(){	return x;	}
-	public double getY(){	return y;	}
+	public ArithmeticExpressionDouble getX(){	return x;	}
+	public ArithmeticExpressionDouble getY(){	return y;	}
 	
 }

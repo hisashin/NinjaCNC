@@ -5,22 +5,24 @@ import st.tori.cnc.stencil.gerber.parser.Gerber;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
 
-public abstract class DStatement implements StatementInterface {
+public abstract class DStatement implements StatementInterface,PositionXYInterface {
 
 	protected abstract int getDIndex();
+	protected double x;
+	protected double y;
 
-	public DStatement(Gerber gerber) {
-		inherit(gerber);
-	}
-	protected void inherit(Gerber gerber) {
-		if(gerber==null)return;
-		PositionXYInterface lastPosition = gerber.getLastPosition();
-		if(lastPosition != null && this instanceof PositionXYInterface) {
-			((PositionXYInterface)this).setX(lastPosition.getX());
-			((PositionXYInterface)this).setY(lastPosition.getY());
-		}
+	public DStatement(PositionXYInterface position, Gerber gerber) {
+		if(position==null)return;
+		setX(position.getX());
+		setY(position.getY());
 	}
 
+	public void setX(double x){	this.x = x;	}
+	public void setY(double y){	this.y = y;	}
+	
+	public double getX(){	return x;	}
+	public double getY(){	return y;	}
+	
 	@Override
 	public final String getSimpleName() {
 		return "D"+NumberUtil.toString(getDIndex(), 2)+"*";

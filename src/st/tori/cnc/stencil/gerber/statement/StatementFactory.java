@@ -1,14 +1,22 @@
 package st.tori.cnc.stencil.gerber.statement;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import st.tori.cnc.stencil.canvas.PositionXYInterface;
+import st.tori.cnc.stencil.canvas.SimpleXY;
 import st.tori.cnc.stencil.gerber.exception.ApertureMacroNotDefinedException;
+import st.tori.cnc.stencil.gerber.exception.ApertureNotDefinedException;
 import st.tori.cnc.stencil.gerber.exception.ArithmeticExpressionUnsupportedException;
 import st.tori.cnc.stencil.gerber.exception.IllegalParameterModifiersException;
+import st.tori.cnc.stencil.gerber.exception.IllegalPositionException;
 import st.tori.cnc.stencil.gerber.exception.IllegalReflectionException;
 import st.tori.cnc.stencil.gerber.exception.NoLastStatementExistsException;
 import st.tori.cnc.stencil.gerber.exception.UnsupportedApertureException;
 import st.tori.cnc.stencil.gerber.exception.UnsupportedIndexException;
+import st.tori.cnc.stencil.gerber.exception.UnsupportedMacroException;
 import st.tori.cnc.stencil.gerber.exception.UnsupportedParameterCodeException;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
 import st.tori.cnc.stencil.gerber.statement.aperture.GerberAperture;
@@ -35,6 +43,17 @@ import st.tori.cnc.stencil.gerber.statement.function.GStatement36;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement37;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement74;
 import st.tori.cnc.stencil.gerber.statement.function.GStatement75;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacro;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroCenterLine;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroCircle;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroLowerLeftLine;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroMoire;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroOutline;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroOutline.ArithmeticExpressionXY;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroPolygon;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroThermal;
+import st.tori.cnc.stencil.gerber.statement.macro.GerberMacroVectorLine;
+import st.tori.cnc.stencil.gerber.statement.macro.UnsupportedMacroInterface;
 import st.tori.cnc.stencil.gerber.statement.parameter.PStatement;
 import st.tori.cnc.stencil.gerber.statement.parameter.PStatementAD;
 import st.tori.cnc.stencil.gerber.statement.parameter.PStatementAM;
@@ -75,22 +94,23 @@ public class StatementFactory {
 		return statement;
 	}
 	
-	public static DStatement createDStatement(int dIndex, Gerber gerber) throws UnsupportedIndexException {
+	public static DStatement createDStatement(int dIndex, String positionStr, Gerber gerber) throws UnsupportedIndexException, ApertureNotDefinedException, IllegalPositionException {
 		DStatement statement = null;
+		PositionXYInterface position = parsePosition(positionStr);
 		if(dIndex==1)
-			statement = new DStatement01(gerber);
+			statement = new DStatement01(position, gerber);
 		else if(dIndex==2)
-			statement = new DStatement02(gerber);
+			statement = new DStatement02(position, gerber);
 		else if(dIndex==3)
-			statement = new DStatement03(gerber);
+			statement = new DStatement03(position, gerber);
 		else if(dIndex>=10)
-			statement = new DStatement10orHigher(gerber);
+			statement = new DStatement10orHigher(dIndex, gerber);
 		if(statement==null || statement instanceof UnsupportedStatementInterface)
 			throw new UnsupportedIndexException("D",dIndex);
 		return statement;
 	}
 
-	public static PStatement createPStatement(String parameterCode, String modifiers, Gerber gerber) throws UnsupportedParameterCodeException, IllegalParameterModifiersException, ArithmeticExpressionUnsupportedException {
+	public static PStatement createPStatement(String parameterCode, String modifiers, Gerber gerber) throws UnsupportedParameterCodeException, IllegalParameterModifiersException, ArithmeticExpressionUnsupportedException, UnsupportedMacroException {
 		PStatement statement = null;
 		if("FS".equals(parameterCode))
 			statement = new PStatementFS(modifiers, gerber);
@@ -137,6 +157,62 @@ public class StatementFactory {
 		return aperture;
 	}
 	
+	public static GerberMacro createMacro(int primitiveCode, String modifiersStr) throws UnsupportedMacroException {
+		GerberMacro macro = null;
+		ModifiersContainer container = new ModifiersContainer(",",modifiersStr);
+		if(primitiveCode==1)
+			macro = new GerberMacroCircle(container.getAsInt(0), container.getAsArithmeticExpressionDouble(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3));
+		else if(primitiveCode==2||primitiveCode==20)
+			macro = new GerberMacroVectorLine(container.getAsInt(0), container.getAsArithmeticExpressionDouble(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3), container.getAsArithmeticExpressionDouble(4), container.getAsArithmeticExpressionDouble(5), container.getAsArithmeticExpressionDouble(6));
+		else if(primitiveCode==21)
+			macro = new GerberMacroCenterLine(container.getAsInt(0), container.getAsArithmeticExpressionDouble(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3), container.getAsArithmeticExpressionDouble(4), container.getAsArithmeticExpressionDouble(5));
+		else if(primitiveCode==22)
+			macro = new GerberMacroLowerLeftLine(container.getAsInt(0), container.getAsArithmeticExpressionDouble(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3), container.getAsArithmeticExpressionDouble(4), container.getAsArithmeticExpressionDouble(5));
+		else if(primitiveCode==4) {
+			int N = container.getAsInt(1);
+			List<ArithmeticExpressionXY> positions = new ArrayList<ArithmeticExpressionXY>();
+			for(int i=0;i<N;i++)
+				positions.add(new ArithmeticExpressionXY(container.getAsArithmeticExpressionDouble(2*i+2), container.getAsArithmeticExpressionDouble(2*i+3)));
+			macro = new GerberMacroOutline(container.getAsInt(0), positions, container.getAsArithmeticExpressionDouble(2*N+2));
+		} else if(primitiveCode==5)
+			macro = new GerberMacroPolygon(container.getAsInt(0), container.getAsArithmeticExpressionInt(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3), container.getAsArithmeticExpressionDouble(4), container.getAsArithmeticExpressionDouble(5));
+		else if(primitiveCode==6)
+			macro = new GerberMacroMoire(container.getAsArithmeticExpressionDouble(0), container.getAsArithmeticExpressionDouble(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3), container.getAsArithmeticExpressionDouble(4), container.getAsArithmeticExpressionInt(5), container.getAsArithmeticExpressionDouble(6), container.getAsArithmeticExpressionDouble(7), container.getAsArithmeticExpressionDouble(8));
+		else if(primitiveCode==7)
+			macro = new GerberMacroThermal(container.getAsArithmeticExpressionDouble(0), container.getAsArithmeticExpressionDouble(1), container.getAsArithmeticExpressionDouble(2), container.getAsArithmeticExpressionDouble(3), container.getAsArithmeticExpressionDouble(4), container.getAsArithmeticExpressionDouble(5));
+		if(macro==null || macro instanceof UnsupportedMacroInterface)
+			throw new UnsupportedMacroException(primitiveCode, modifiersStr);
+		return macro;
+	}
+	
+	public static class ArithmeticExpression {
+		protected String expression;
+		public ArithmeticExpression(String expression) {
+			this.expression = expression;
+		}
+		public String toString(){	return expression;	}
+	}
+	public static class ArithmeticExpressionDouble extends ArithmeticExpression {
+		public ArithmeticExpressionDouble(String expression) {
+			super(expression);
+		}
+		public Double value(GerberMacro macro) throws ArithmeticExpressionUnsupportedException {
+			if(expression.indexOf("$")<0)
+				return parseDouble(expression);
+			throw new ArithmeticExpressionUnsupportedException(toString());
+		}
+	}
+	public static class ArithmeticExpressionInt extends ArithmeticExpression {
+		public ArithmeticExpressionInt(String expression) {
+			super(expression);
+		}
+		public Integer value(GerberMacro macro) throws ArithmeticExpressionUnsupportedException {
+			if(expression.indexOf("$")<0)
+				return Integer.parseInt(expression);
+			throw new ArithmeticExpressionUnsupportedException(toString());
+		}
+	}
+	
 	public static class ModifiersContainer extends ArrayList<String> {
 		
 		public ModifiersContainer(String sep, String modifiersStr) {
@@ -145,6 +221,12 @@ public class StatementFactory {
 				add(val);
 		}
 		
+		public ArithmeticExpressionDouble getAsArithmeticExpressionDouble(int index) {
+			return (size()<index)?null:new ArithmeticExpressionDouble(get(index));
+		}
+		public ArithmeticExpressionInt getAsArithmeticExpressionInt(int index) {
+			return (size()<index)?null:new ArithmeticExpressionInt(get(index));
+		}
 		public Double getAsDouble(int index) {
 			return (size()<index)?null:parseDouble(get(index));
 		}
@@ -162,6 +244,13 @@ public class StatementFactory {
 	public static double parseDouble(String val) {
 		if(val.startsWith("."))val = "0" + val;
 		return Double.parseDouble(val);
+	}
+	private static final Pattern PATTERN_XY = Pattern.compile("^X(.+?)Y(.+?)$");
+	public static PositionXYInterface parsePosition(String positionStr) throws IllegalPositionException {
+		Matcher matcher = PATTERN_XY.matcher(positionStr);
+		if(!matcher.find())
+			throw new IllegalPositionException(positionStr);
+		return new SimpleXY(parseDouble(matcher.group(1)), parseDouble(matcher.group(2)));
 	}
 
 }

@@ -1,17 +1,18 @@
 package st.tori.cnc.stencil.gerber.statement.macro;
 
-import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionDouble;
+
 
 public class GerberMacroThermal extends GerberMacro {
 
-	protected double x;
-	protected double y;
-	protected double outerDiameter;
-	protected double innerDiameter;
-	protected double gapThickness;
+	protected ArithmeticExpressionDouble x;
+	protected ArithmeticExpressionDouble y;
+	protected ArithmeticExpressionDouble outerDiameter;
+	protected ArithmeticExpressionDouble innerDiameter;
+	protected ArithmeticExpressionDouble gapThickness;
 	
-	public GerberMacroThermal(int exposure, double x, double y, double outerDiameter, double innerDiameter, double gapThickness, double rotationAngle, Gerber gerber) {
-		super(exposure, rotationAngle, gerber);
+	public GerberMacroThermal(ArithmeticExpressionDouble x, ArithmeticExpressionDouble y, ArithmeticExpressionDouble outerDiameter, ArithmeticExpressionDouble innerDiameter, ArithmeticExpressionDouble gapThickness, ArithmeticExpressionDouble rotationAngle) {
+		super(1, rotationAngle);
 		this.x = x;
 		this.y = y;
 		this.outerDiameter = outerDiameter;
@@ -19,10 +20,10 @@ public class GerberMacroThermal extends GerberMacro {
 		this.gapThickness = gapThickness;
 	}
 	
-	public double getX(){	return x;	}
-	public double getY(){	return y;	}
-	public double getOuterDiameter(){	return outerDiameter;	}
-	public double getInnerDiameter(){	return innerDiameter;	}
-	public double getGapThickness(){	return gapThickness;	}
+	public ArithmeticExpressionDouble getX(){	return x;	}
+	public ArithmeticExpressionDouble getY(){	return y;	}
+	public ArithmeticExpressionDouble getOuterDiameter(){	return outerDiameter;	}
+	public ArithmeticExpressionDouble getInnerDiameter(){	return innerDiameter;	}
+	public ArithmeticExpressionDouble getGapThickness(){	return gapThickness;	}
 	
 }

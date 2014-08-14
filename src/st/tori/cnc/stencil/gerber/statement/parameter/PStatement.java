@@ -1,4 +1,4 @@
-package st.tori.cnc.stencil.gerber.statement;
+package st.tori.cnc.stencil.gerber.statement.parameter;
 
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.gerber.exception.IllegalParameterModifiersException;

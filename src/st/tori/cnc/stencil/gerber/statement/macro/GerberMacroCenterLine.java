@@ -1,25 +1,26 @@
 package st.tori.cnc.stencil.gerber.statement.macro;
 
-import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionDouble;
+
 
 public class GerberMacroCenterLine extends GerberMacro {
 
-	protected double width;
-	protected double height;
-	protected double x;
-	protected double y;
+	protected ArithmeticExpressionDouble width;
+	protected ArithmeticExpressionDouble height;
+	protected ArithmeticExpressionDouble x;
+	protected ArithmeticExpressionDouble y;
 	
-	public GerberMacroCenterLine(int exposure, double width, double height, double x, double y, double rotationAngle, Gerber gerber) {
-		super(exposure, rotationAngle, gerber);
+	public GerberMacroCenterLine(int exposure, ArithmeticExpressionDouble width, ArithmeticExpressionDouble height, ArithmeticExpressionDouble x, ArithmeticExpressionDouble y, ArithmeticExpressionDouble rotationAngle) {
+		super(exposure, rotationAngle);
 		this.width = width;
 		this.height = height;
 		this.x = x;
 		this.y = y;
 	}
 	
-	public double getWidth(){	return width;	}
-	public double getHeight(){	return height;	}
-	public double getX(){	return x;	}
-	public double getY(){	return y;	}
+	public ArithmeticExpressionDouble getWidth(){	return width;	}
+	public ArithmeticExpressionDouble getHeight(){	return height;	}
+	public ArithmeticExpressionDouble getX(){	return x;	}
+	public ArithmeticExpressionDouble getY(){	return y;	}
 	
 }

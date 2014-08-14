@@ -1,28 +1,19 @@
 package st.tori.cnc.stencil.gerber.statement.macro;
 
-import st.tori.cnc.stencil.canvas.PositionXYInterface;
-import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementFactory.ArithmeticExpressionDouble;
+
 
 public abstract class GerberMacro {
 
 	protected boolean exposure;
-	protected double rotationAngle;
+	protected ArithmeticExpressionDouble rotationAngle;
 	
-	public GerberMacro(int exposure, double rotationAngle, Gerber gerber) {
-		inherit(gerber);
+	public GerberMacro(int exposure, ArithmeticExpressionDouble rotationAngle) {
 		this.exposure = (exposure>=1);
 		this.rotationAngle = rotationAngle;
 	}
-	protected void inherit(Gerber gerber) {
-		if(gerber==null)return;
-		PositionXYInterface lastPosition = gerber.getLastPosition();
-		if(lastPosition != null && this instanceof PositionXYInterface) {
-			((PositionXYInterface)this).setX(lastPosition.getX());
-			((PositionXYInterface)this).setY(lastPosition.getY());
-		}
-	}
 	
 	public boolean getExposure(){	return exposure;	}
-	public double getRotationAngle(){	return rotationAngle;	}
+	public ArithmeticExpressionDouble getRotationAngle(){	return rotationAngle;	}
 
 }
