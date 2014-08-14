@@ -1,7 +1,7 @@
-NinjaCNC
+NinjaCNC - Solder Stencil G-Code Generator
 ========
 
-Convert Gerber RS274X to G-Code to mil solder stencil
+Exchange Gerber RS274X into G-Code to get solder stencil with CNC.
 
 Gerber specification: http://www.ucamco.com/downloads
 
