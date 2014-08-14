@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 import st.tori.cnc.stencil.gerber.exception.GerberException;
 import st.tori.cnc.stencil.gerber.exception.IllegalParameterException;
 import st.tori.cnc.stencil.gerber.exception.UnsupportedPrefixException;
-import st.tori.cnc.stencil.gerber.statement.Comment;
 import st.tori.cnc.stencil.gerber.statement.StatementFactory;
 import st.tori.cnc.stencil.gerber.statement.StatementInterface;
+import st.tori.cnc.stencil.gerber.statement.function.Comment;
 import st.tori.cnc.stencil.util.FileUtil;
 
 

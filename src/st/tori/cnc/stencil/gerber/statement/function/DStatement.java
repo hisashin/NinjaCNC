@@ -1,7 +1,8 @@
-package st.tori.cnc.stencil.gerber.statement;
+package st.tori.cnc.stencil.gerber.statement.function;
 
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 import st.tori.cnc.stencil.util.NumberUtil;
 
 public abstract class DStatement implements StatementInterface {

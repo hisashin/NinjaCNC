@@ -1,14 +1,20 @@
 package st.tori.cnc.stencil.gerber.statement;
 
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
+import st.tori.cnc.stencil.gerber.exception.IllegalParameterModifiersException;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
-import st.tori.cnc.stencil.util.NumberUtil;
+import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 
-public abstract class GStatement implements StatementInterface {
 
-	public abstract int getGIndex();
+
+public abstract class PStatement implements StatementInterface {
+
+	protected abstract String getParameterCode();
 	
-	public GStatement(Gerber gerber) {
+	protected String modifiers;
+	
+	public PStatement(String modifiers, Gerber gerber) throws IllegalParameterModifiersException {
+		this.modifiers = modifiers;
 		inherit(gerber);
 	}
 	protected void inherit(Gerber gerber) {
@@ -20,9 +26,13 @@ public abstract class GStatement implements StatementInterface {
 		}
 	}
 	
+	protected String getModifiers(){
+		return modifiers;
+	}
+
 	@Override
 	public final String getSimpleName() {
-		return "G"+NumberUtil.toString(getGIndex(), 2);
+		return "%"+getParameterCode()+getModifiers()+"%";
 	}
 
 }

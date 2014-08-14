@@ -1,4 +1,6 @@
-package st.tori.cnc.stencil.gerber.statement;
+package st.tori.cnc.stencil.gerber.statement.function;
+
+import st.tori.cnc.stencil.gerber.statement.StatementInterface;
 
 
 public class Comment implements StatementInterface {

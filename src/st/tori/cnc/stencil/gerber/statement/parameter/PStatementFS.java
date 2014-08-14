@@ -1,4 +1,4 @@
-package st.tori.cnc.stencil.gerber.statement;
+package st.tori.cnc.stencil.gerber.statement.parameter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
