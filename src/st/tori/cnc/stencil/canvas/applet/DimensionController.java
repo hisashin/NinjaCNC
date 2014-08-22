@@ -14,6 +14,7 @@ import st.tori.cnc.stencil.canvas.shape.Rectangle;
 
 public class DimensionController {
 
+	private static final float MIN_STROKE = 0.2f;
 	private boolean debug;
 	private Applet applet;
 	private Graphics graphics;
@@ -24,6 +25,8 @@ public class DimensionController {
 	private double xyWidth;
 	private double xyHeight;
 	private double ratio;
+	
+	private Color currentColor = null;
 	
 	public DimensionController(boolean debug, Applet applet, Graphics graphics, PositionXYInterface[] xyMinMax) {
 		this.debug = debug;
@@ -50,17 +53,22 @@ public class DimensionController {
 			}
 		}
 	}
+	@Override
+	public String toString() {
+		return "DimensionController[dimension.getWidth()="+applet.getSize().getWidth()+",dimension.getHeight()="+applet.getSize().getHeight()+",xyMin=("+xyMinMax[0].getX()+","+xyMinMax[0].getY()+"),xyMax=("+xyMinMax[1].getX()+","+xyMinMax[1].getY()+"),xyWidth="+xyWidth+",xyHeight="+xyHeight+"]";
+	}
 	
 	public void drawPolyline(Polyline obj) {
 		PositionXYInterface[] xyArray = obj.getXYArray();
 		if(xyArray==null||xyArray.length<=1)return;
-		float stroke = obj.getStroke();
+		float stroke = (float)Math.max(obj.getStroke()*ratio,MIN_STROKE);
 		if(stroke>0)
-			((Graphics2D)graphics).setStroke(new BasicStroke((float)(stroke*ratio)));
+			((Graphics2D)graphics).setStroke(new BasicStroke(stroke));
 		PositionXYInterface lastPosition = xyArray[0];
 		for(int i=1;i<xyArray.length;i++) {
 			graphics.drawLine(getXtoShow(lastPosition.getX()), getYtoShow(lastPosition.getY()), 
 					getXtoShow(xyArray[i].getX()), getYtoShow(xyArray[i].getY()));
+			//System.out.println("graphics.drawLine[("+getXtoShow(lastPosition.getX())+","+getYtoShow(lastPosition.getY())+") to ("+getXtoShow(xyArray[i].getX())+","+getYtoShow(xyArray[i].getY())+")]");
 			lastPosition = xyArray[i];
 		}
 	}
@@ -68,6 +76,7 @@ public class DimensionController {
 		PositionXYInterface origin = obj.getOrigin();
 		double diameter = obj.getDiameter();
 		graphics.fillOval(getXtoShow(origin.getX()-diameter/2),getYtoShow(origin.getY()+diameter/2), getXtoShow(diameter), getYtoShow(diameter));
+		//System.out.println("graphics.fillOval("+getXtoShow(origin.getX()-diameter/2)+","+getYtoShow(origin.getY()+diameter/2)+","+getXtoShow(diameter)+","+getYtoShow(diameter)+")");
 	}
 	public void drawRectangle(Rectangle obj) {
 		PositionXYInterface lowerLeftOrigin = obj.getLowerLeftOrigin();
@@ -75,6 +84,7 @@ public class DimensionController {
 		double height = obj.getHeight();
 		double rotationAngleInDeg = obj.getRotationAngleInDeg();
 		graphics.fillRect(getXtoShow(lowerLeftOrigin.getX()),getYtoShow(lowerLeftOrigin.getY()), getXtoShow(width), getYtoShow(height));
+		//System.out.println("graphics.fillRect("+getXtoShow(lowerLeftOrigin.getX())+","+getYtoShow(lowerLeftOrigin.getY())+","+getXtoShow(width)+","+getYtoShow(height)+")");
 	}
 	
 	private int getXtoShow(double x) {

@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.canvas.shape;
 
+import java.awt.Color;
+
 import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
@@ -10,6 +12,7 @@ public class Circle implements Drawable {
 
 	protected PositionXYInterface origin;
 	protected double diameter;
+	protected Color color;
 	
 	public Circle(PositionXYInterface origin, double diameter) {
 		this.origin = origin;
@@ -18,6 +21,8 @@ public class Circle implements Drawable {
 	
 	public PositionXYInterface getOrigin(){	return origin;	}
 	public double getDiameter(){	return diameter;	}
+	public void setColor(Color color) {	this.color = color;	}
+	public Color getColor(){	return color;	}
 	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {
@@ -30,5 +35,9 @@ public class Circle implements Drawable {
 	@Override
 	public void draw(DimensionController dc) {
 		dc.drawCircle(this);
+	}
+	@Override
+	public String toString() {
+		return "Circle[origin=("+origin.getX()+","+origin.getY()+"),diameter="+diameter+"]";
 	}
 }

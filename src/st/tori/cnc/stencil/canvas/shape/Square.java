@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.canvas.shape;
 
+import java.awt.Color;
+
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
 
@@ -14,5 +16,7 @@ public class Square extends Polygon {
 			new SimpleXY(x0,y0),
 		},stroke);
 	}
+	@Override
+	protected String getName() {	return "Square";	}
 	
 }

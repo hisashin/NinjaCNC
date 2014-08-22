@@ -5,7 +5,6 @@ G75*
 %IPPOS*%
 %LPD*%
 %AMOC8*
-0 testcomment*
 5,1,8,0,0,1.08239X$1,22.5*
 %
 %ADD10C,0.0100*%

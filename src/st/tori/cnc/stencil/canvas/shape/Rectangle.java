@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.canvas.shape;
 
+import java.awt.Color;
+
 import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
@@ -13,6 +15,7 @@ public class Rectangle implements Drawable {
 	protected double width;
 	protected double height;
 	protected double rotationAngleInDeg;
+	protected Color color;
 	
 	public Rectangle(PositionXYInterface lowerLeftOrigin, double width, double height, double rotationAngleInDeg) {
 		this.lowerLeftOrigin = lowerLeftOrigin;
@@ -25,6 +28,8 @@ public class Rectangle implements Drawable {
 	public double getWidth(){	return width;	}
 	public double getHeight(){	return height;	}
 	public double getRotationAngleInDeg(){	return rotationAngleInDeg;	}
+	public void setColor(Color color) {	this.color = color;	}
+	public Color getColor(){	return color;	}
 	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {
@@ -51,5 +56,9 @@ public class Rectangle implements Drawable {
 	@Override
 	public void draw(DimensionController dc) {
 		dc.drawRectangle(this);
+	}
+	@Override
+	public String toString() {
+		return "Rectangle[lowerLeftOrigin=("+lowerLeftOrigin.getX()+","+lowerLeftOrigin.getY()+"),width="+width+",height="+height+",rotationAngleInDeg="+rotationAngleInDeg+"]";
 	}
 }

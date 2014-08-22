@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.canvas.shape;
 
+import java.awt.Color;
+
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 
 
@@ -16,5 +18,6 @@ public class Polygon extends Polyline {
 		xyArray[xyArray.length-1] = xyArray[0];
 		return xyArray;
 	}
-	
+	@Override
+	protected String getName() {	return "Polygon";	}
 }

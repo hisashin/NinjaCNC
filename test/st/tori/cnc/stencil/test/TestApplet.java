@@ -15,12 +15,23 @@ import st.tori.cnc.stencil.gerber.parser.GerberParser;
 
 public class TestApplet extends Applet {
 
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBL";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBO";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBP";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBS";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GML";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTL";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTO";
+	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTP";
+	private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTS";
+	
 	@Test
-	public void paintNcd(Graphics g) {
+	public void paint(Graphics g) {
 		try {
 			GerberParser gbParser = new GerberParser();
-			Gerber gerber = gbParser.parse(new File("../gerber/harpyx/HARPYX_140622.GTS"));
+			Gerber gerber = gbParser.parse(new File(GERBER_FILEPATH));
 			DimensionController dc = new DimensionController(true,this,g,gerber.getXYMinMax());
+			System.out.println(dc.toString());
 			gerber.draw(dc);
 			assertTrue(true);
 		} catch (GerberException e) {
@@ -34,6 +45,7 @@ public class TestApplet extends Applet {
 			GCodeParser gcParser = new GCodeParser();
 			GCode code = gcParser.parse(Drill.ORIMIN_VC, new File("../gerber/Levistone_tcream.ncd"));
 			DimensionController dc = new DimensionController(true,this,g,code.getXYMinMax());
+			System.out.println(dc.toString());
 			code.draw(dc);
 			assertTrue(true);
 		} catch (GCodeException e) {

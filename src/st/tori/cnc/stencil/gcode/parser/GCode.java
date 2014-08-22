@@ -1,5 +1,6 @@
 package st.tori.cnc.stencil.gcode.parser;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +50,10 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 	public double getCutHeight(){	return cutHeight;	}
 	public double getDownSpeed(){	return downSpeed;	}
 	public double getCutSpeed(){	return cutSpeed;	}
+	
+	private Color color = null;
+	public void setColor(Color color) {	this.color = color;	}
+	public Color getColor(){	return color;	}
 	
 	private boolean initialized = false;
 	private boolean finalized = false;

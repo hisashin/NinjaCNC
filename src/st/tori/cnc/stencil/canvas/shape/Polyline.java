@@ -1,5 +1,7 @@
 package st.tori.cnc.stencil.canvas.shape;
 
+import java.awt.Color;
+
 import st.tori.cnc.stencil.canvas.Drawable;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
@@ -10,6 +12,7 @@ public class Polyline implements Drawable {
 
 	protected PositionXYInterface[] xyArray;
 	protected float stroke;
+	protected Color color;
 	
 	public Polyline(PositionXYInterface[] xyArray, float stroke) {
 		this.xyArray = xyArray;
@@ -18,6 +21,8 @@ public class Polyline implements Drawable {
 	
 	public PositionXYInterface[] getXYArray(){	return xyArray;	}
 	public float getStroke(){	return stroke;	}
+	public void setColor(Color color) {	this.color = color;	}
+	public Color getColor(){	return color;	}
 	
 	@Override
 	public PositionXYInterface[] getXYMinMax() {
@@ -43,4 +48,17 @@ public class Polyline implements Drawable {
 	public void draw(DimensionController dc) {
 		dc.drawPolyline(this);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer(getName()+"[");
+		for(int i=0;i<xyArray.length;i++) {
+			if(i>0)buf.append(",");
+			PositionXYInterface position = xyArray[i];
+			buf.append("("+position.getX()+","+position.getY()+")");
+		}
+		buf.append(",stroke="+stroke+"]");
+		return buf.toString();
+	}
+	protected String getName() {	return "PolyLine";	}
 }

@@ -1,6 +1,8 @@
 package st.tori.cnc.stencil.gerber.parser;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +52,10 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 		if(!initialized)return;
 		finalized = true;
 	}
+	
+	private Color color = null;
+	public void setColor(Color color) {	this.color = color;	}
+	public Color getColor(){	return color;	}
 		
 	@Override
 	public String toString() {
@@ -219,8 +225,19 @@ public class Gerber extends ArrayList<StatementInterface> implements Drawable {
 			lastStatement = (GStatement)statement;
 		if(statement instanceof PositionXYInterface)
 			lastPosition = (PositionXYInterface)statement;
-		if(statement instanceof DrawableCollection)
-			drawables.addAll(((DrawableCollection)statement).getDrawables());
+		if(statement instanceof DrawableCollection) {
+			Collection<Drawable> collection = ((DrawableCollection)statement).getDrawables();
+			System.out.print("Adding "+collection.size()+" drawables:");
+			Iterator<Drawable> ite = collection.iterator();
+			while(ite.hasNext())
+				System.out.print(ite.next());
+			System.out.println();
+			drawables.addAll(collection);
+		}
+		if(statement instanceof Drawable) {
+			drawables.add((Drawable)statement);
+			System.out.println("Adding drawable:"+statement);
+		}
 		return super.add(statement);
 	}
 	

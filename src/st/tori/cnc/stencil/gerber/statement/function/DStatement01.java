@@ -8,6 +8,7 @@ import st.tori.cnc.stencil.canvas.DrawableCollection;
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 import st.tori.cnc.stencil.canvas.shape.Line;
 import st.tori.cnc.stencil.gerber.parser.Gerber;
+import st.tori.cnc.stencil.gerber.statement.aperture.GerberAperture;
 
 /*
  * Interpolate operation code
@@ -22,9 +23,15 @@ public class DStatement01 extends DStatement implements DrawableCollection {
 	public DStatement01(PositionXYInterface position, Gerber gerber) {
 		super(position, gerber);
 		PositionXYInterface lastPosition = gerber.getLastPosition();
-		collection.addAll(gerber.getCurrentAperture().createDrawableCollection(lastPosition));
-		collection.add(new Line(lastPosition, position, gerber.getCurrentAperture().getStroke(lastPosition,position)));
-		collection.addAll(gerber.getCurrentAperture().createDrawableCollection(position));
+		GerberAperture aperture = gerber.getCurrentAperture();
+		Collection<Drawable> sub;
+		sub = aperture.createDrawableCollection(lastPosition);
+		if(sub!=null)
+			collection.addAll(sub);
+		collection.add(new Line(lastPosition, position, aperture.getStroke(lastPosition,position)));
+		sub = aperture.createDrawableCollection(position);
+		if(sub!=null)
+			collection.addAll(sub);
 	}
 
 	@Override
