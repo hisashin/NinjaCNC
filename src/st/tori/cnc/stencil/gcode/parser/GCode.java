@@ -316,12 +316,12 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		}else if(xDiff<polygonToLineThrethold) {
 			double centerX = (minX+maxX)/2;
 			return new Polyline(new PositionXYInterface[]{
-				new SimpleXY(centerX, minY),new SimpleXY(centerX, maxY),new SimpleXY(centerX, minY)
+				new SimpleXY(centerX, minY),new SimpleXY(centerX, maxY),new SimpleXY(centerX, minY),new SimpleXY(centerX, maxY)
 			},  polyline.getStroke());
 		}else if(yDiff<polygonToLineThrethold) {
 			double centerY = (minY+maxY)/2;
 			return new Polyline(new PositionXYInterface[]{
-				new SimpleXY(minX, centerY),new SimpleXY(maxX, centerY),new SimpleXY(minX, centerY)
+				new SimpleXY(minX, centerY),new SimpleXY(maxX, centerY),new SimpleXY(minX, centerY),new SimpleXY(maxX, centerY)
 			},  polyline.getStroke());
 		}else{
 			//inclined ones not yet supported
