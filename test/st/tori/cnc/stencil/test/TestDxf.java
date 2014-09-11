@@ -16,6 +16,7 @@ import st.tori.cnc.stencil.gcode.drill.Drill;
 import st.tori.cnc.stencil.gcode.exception.GCodeException;
 import st.tori.cnc.stencil.util.FileUtil;
 
+@SuppressWarnings("serial")
 public class TestDxf extends Applet {
 
 	//private static final String DXF_FILEPATH = "../sample/dxf/simple.dxf";

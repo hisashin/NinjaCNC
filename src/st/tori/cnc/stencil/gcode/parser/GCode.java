@@ -12,6 +12,7 @@ import st.tori.cnc.stencil.canvas.SimpleXY;
 import st.tori.cnc.stencil.canvas.applet.DimensionController;
 import st.tori.cnc.stencil.canvas.shape.Line;
 import st.tori.cnc.stencil.canvas.shape.Polygon;
+import st.tori.cnc.stencil.canvas.shape.Polyline;
 import st.tori.cnc.stencil.gcode.action.ActionInterface;
 import st.tori.cnc.stencil.gcode.action.Comment;
 import st.tori.cnc.stencil.gcode.action.GAction;
@@ -44,6 +45,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 	private double cutHeight = Double.MAX_VALUE;
 	private double downSpeed = 0;
 	private double cutSpeed = 0;
+	private double polygonToLineThrethold = 0.3;
 	
 	public Drill getDrill(){	return drill;	}
 	public double getAirCutHeight(){	return airCutHeight;	}
@@ -299,8 +301,28 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		};
 	}
 	
-	public final boolean add(Polygon polygon) {
-		PositionXYInterface[] array = polygon.getXYArray();
+	protected final Polyline changePolylineToLine(Polyline polyline) {
+		PositionXYInterface[] xyMinMax = polyline.getXYMinMax();
+		double minX = xyMinMax[0].getX();
+		double minY = xyMinMax[0].getY();
+		double maxX = xyMinMax[1].getX();
+		double maxY = xyMinMax[1].getY();
+		double xDiff = Math.abs(minX-maxX);
+		double yDiff = Math.abs(minY-maxY);
+		if(xDiff<polygonToLineThrethold&&yDiff<polygonToLineThrethold) {
+			return new Line(new SimpleXY((minX+maxX)/2, (minY+maxY)/2), new SimpleXY((minX+maxX)/2, (minY+maxY)/2), polyline.getStroke());
+		}else if(xDiff<polygonToLineThrethold) {
+			return new Line(new SimpleXY((minX+maxX)/2, minY), new SimpleXY((minX+maxX)/2, maxY), polyline.getStroke());
+		}else if(yDiff<polygonToLineThrethold) {
+			return new Line(new SimpleXY(minX, (minY+maxY)/2), new SimpleXY(maxX, (minY+maxY)/2), polyline.getStroke());
+		}else{
+			//inclined ones not yet supported
+		}
+		return polyline;
+	}
+	public final boolean add(Polyline polyline) {
+		polyline = changePolylineToLine(polyline);
+		PositionXYInterface[] array = polyline.getXYArray();
 		{
 			GAction00 action = new GAction00(this);
 			action.setZ(getAirCutHeight());
@@ -327,7 +349,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 			action.setZ(getAirCutHeight());
 			add(action);
 		}
-		return drawables.add(polygon);
+		return drawables.add(polyline);
 	}
 	
 }
