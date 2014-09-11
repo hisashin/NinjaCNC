@@ -301,7 +301,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		};
 	}
 	
-	protected final Polyline[] changePolylineToLine(Polyline polyline) {
+	protected final Polyline changePolylineToLine(Polyline polyline) {
 		PositionXYInterface[] xyMinMax = polyline.getXYMinMax();
 		double minX = xyMinMax[0].getX();
 		double minY = xyMinMax[0].getY();
@@ -312,37 +312,24 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		if(xDiff<polygonToLineThrethold&&yDiff<polygonToLineThrethold) {
 			double centerX = (minX+maxX)/2;
 			double centerY = (minY+maxY)/2;
-			return new Polyline[]{
-				new Line(new SimpleXY(centerX, centerY), new SimpleXY(centerX, centerY), polyline.getStroke()),
-			};
+			return new Line(new SimpleXY(centerX, centerY), new SimpleXY(centerX, centerY), polyline.getStroke());
 		}else if(xDiff<polygonToLineThrethold) {
 			double centerX = (minX+maxX)/2;
-			double centerY = (minY+maxY)/2;
-			return new Polyline[]{
-				new Line(new SimpleXY(centerX, centerY),new SimpleXY(centerX, minY),  polyline.getStroke()),
-				new Line(new SimpleXY(centerX, centerY),new SimpleXY(centerX, maxY),  polyline.getStroke()),
-			};
+			return new Polyline(new PositionXYInterface[]{
+				new SimpleXY(centerX, minY),new SimpleXY(centerX, maxY),new SimpleXY(centerX, minY)
+			},  polyline.getStroke());
 		}else if(yDiff<polygonToLineThrethold) {
-			double centerX = (minX+maxX)/2;
 			double centerY = (minY+maxY)/2;
-			return new Polyline[]{
-				new Line(new SimpleXY(centerX, centerY),new SimpleXY(minX, centerY),  polyline.getStroke()),
-				new Line(new SimpleXY(centerX, centerY),new SimpleXY(maxX, centerY),  polyline.getStroke()),
-			};
+			return new Polyline(new PositionXYInterface[]{
+				new SimpleXY(minX, centerY),new SimpleXY(maxX, centerY),new SimpleXY(minX, centerY)
+			},  polyline.getStroke());
 		}else{
 			//inclined ones not yet supported
 		}
-		return new Polyline[]{polyline};
+		return polyline;
 	}
 	public final boolean add(Polyline polyline) {
-		Polyline[] polylines = changePolylineToLine(polyline);
-		boolean result = true;
-		for(Polyline _polyline: polylines) {
-			if(!_add(_polyline))result = false;
-		}
-		return result;
-	}
-	private final boolean _add(Polyline polyline) {
+		polyline = changePolylineToLine(polyline);
 		PositionXYInterface[] array = polyline.getXYArray();
 		{
 			GAction00 action = new GAction00(this);
