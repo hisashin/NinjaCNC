@@ -19,8 +19,9 @@ import st.tori.cnc.stencil.util.FileUtil;
 public class TestDxf extends Applet {
 
 	//private static final String DXF_FILEPATH = "../sample/dxf/simple.dxf";
-	private static final String DXF_FILEPATH = "../sample/dxf/complexed.dxf";
-	private static final String GCODE_FILEPATH = "/Users/shingo/Desktop/SampleGCode.ncd";
+	//private static final String DXF_FILEPATH = "../sample/dxf/complexed.dxf";
+	private static final String DXF_FILEPATH = "../sample/dxf/0.5mm.dxf";
+	private static final String GCODE_FILEPATH = "../sample/dxf/0.5mm.ncd";
 	
 	@Test
 	public void paint(Graphics g) {

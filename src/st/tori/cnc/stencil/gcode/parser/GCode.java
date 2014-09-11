@@ -82,7 +82,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		add(new Comment("Header"));
 		if(unit==UNIT.MM)
 			add(new GAction21(this));
-		else if(unit==UNIT.INCH)
+		else if(unit==UNIT.INCH) 
 			add(new GAction20(this));
 		//Set exact stop mode without mind
 		add(new GAction61(this));

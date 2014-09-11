@@ -24,7 +24,7 @@ public class DxfParser {
 
 	public Dxf parse(Drill drill, File file) throws UnsupportedPrefixException, UnsupportedIndexException, PositionNotSupportedException, SpeedNotSupportedException, NoLastActionExistsException, IllegalReflectionException, IllegalLineException, OffsetNotSupportedException {
 		Dxf dxf = new Dxf(drill);
-		dxf.initialize(5, 1, -0.15, 100.0, 300.0);
+		dxf.initialize(2, 0.5, -0.1, 10.0, 50.0);
 		List<String> list = FileUtil.readFileAsStringList(file);
 		LineIterator ite = new LineIterator(list.iterator());
 		while(ite.hasNext()) {
