@@ -77,13 +77,13 @@ public class TestGCode {
 	}
 	@Test
 	public void testSimpleStencilWithSquareFromFile() {
-		assertGCode(FileUtil.readFileAsString(new File("gerber/Levistone_tcream.ncd")),
+		assertGCode(FileUtil.readFileAsString(new File("sample/gcode/Levistone_tcream.ncd")),
 				new GCodeSampleLevistoneTCream());
 	}
 	@Test
 	public void testParser() {
 		try {
-			File file = new File("gerber/Levistone_tcream.ncd");
+			File file = new File("sample/gcode/Levistone_tcream.ncd");
 			GCodeParser gcParser = new GCodeParser();
 			GCode codeNcd = gcParser.parse(Drill.ORIMIN_VC, file);
 			assertGCode(FileUtil.readFileAsString(file), codeNcd);
@@ -96,7 +96,7 @@ public class TestGCode {
 	@Test
 	public void testRemove4CornerHoles() {
 		try {
-			File file = new File("gerber/Levistone-sol-out.ncd");
+			File file = new File("sample/gcode/Levistone-sol-out.ncd");
 			GCodeParser gcParser = new GCodeParser();
 			GCode _code = gcParser.parse(Drill.ORIMIN_VC, file);
 			GCode code = GCodeUtil.remove4CornerHoles(_code);
@@ -110,7 +110,7 @@ public class TestGCode {
 	@Test
 	public void testDeppDrilling4CornerHoles() {
 		try {
-			File file = new File("gerber/Levistone-cmp.ncd");
+			File file = new File("sample/gcode/Levistone-cmp.ncd");
 			GCodeParser gcParser = new GCodeParser();
 			GCode _code = gcParser.parse(Drill.ORIMIN_VC, file);
 			GCode code = GCodeUtil.deepDrilling4CornerHoles(_code,-3.141);
@@ -127,7 +127,7 @@ public class TestGCode {
 	@Test
 	public void testChangeDrillForOutline() {
 		try {
-			File file = new File("gerber/Levistone-sol-out.ncd");
+			File file = new File("sample/gcode/Levistone-sol-out.ncd");
 			GCodeParser gcParser = new GCodeParser();
 			GCode _code = gcParser.parse(Drill.ORIMIN_VC, file);
 			GCode code = GCodeUtil.changeDrillForOutline(_code);

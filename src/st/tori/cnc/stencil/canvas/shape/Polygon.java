@@ -1,7 +1,5 @@
 package st.tori.cnc.stencil.canvas.shape;
 
-import java.awt.Color;
-
 import st.tori.cnc.stencil.canvas.PositionXYInterface;
 
 

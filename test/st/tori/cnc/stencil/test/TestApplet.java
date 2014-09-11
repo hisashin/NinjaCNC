@@ -15,15 +15,15 @@ import st.tori.cnc.stencil.gerber.parser.GerberParser;
 
 public class TestApplet extends Applet {
 
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBL";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBO";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBP";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GBS";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GML";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTL";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTO";
-	//private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTP";
-	private static final String GERBER_FILEPATH = "../gerber/harpyx/HARPYX_140622.GTS";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GBL";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GBO";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GBP";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GBS";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GML";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GTL";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GTO";
+	//private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GTP";
+	private static final String GERBER_FILEPATH = "../sample/gerber/harpyx/HARPYX_140622.GTS";
 	
 	@Test
 	public void paint(Graphics g) {
@@ -43,7 +43,7 @@ public class TestApplet extends Applet {
 	public void paint(Graphics g) {
 		try {
 			GCodeParser gcParser = new GCodeParser();
-			GCode code = gcParser.parse(Drill.ORIMIN_VC, new File("../gerber/Levistone_tcream.ncd"));
+			GCode code = gcParser.parse(Drill.ORIMIN_VC, new File("../sample/gcode/Levistone_tcream.ncd"));
 			DimensionController dc = new DimensionController(true,this,g,code.getXYMinMax());
 			System.out.println(dc.toString());
 			code.draw(dc);

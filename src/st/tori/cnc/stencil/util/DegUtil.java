@@ -5,6 +5,9 @@ public class DegUtil {
 	public static double toRad(double deg) {
 		return 2*Math.PI*deg/360.0;
 	}
+	public static double toDeg(double rad) {
+		return 180.0*rad/Math.PI;
+	}
 	public static double cos(double deg){
 		return Math.cos(toRad(deg));
 	}

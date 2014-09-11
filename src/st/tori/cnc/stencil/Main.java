@@ -13,7 +13,7 @@ public class Main {
 		/*
 		try {
 			GCodeParser gcParser = new GCodeParser();
-			GCode codeNcd = gcParser.parse(new File("gerber/Levistone_tcream.ncd"));
+			GCode codeNcd = gcParser.parse(new File("sample/gcode/Levistone_tcream.ncd"));
 		} catch (GCodeException e) {
 			e.printStackTrace();
 		}

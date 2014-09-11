@@ -36,7 +36,7 @@ import st.tori.cnc.stencil.util.PositionUtil;
 
 public class GCode extends ArrayList<ActionInterface> implements Drawable {
 
-	private static final String RET = "\n";
+	protected static final String RET = "\n";
 
 	private Drill drill;
 	private double initialAirCutHeight = Double.MAX_VALUE;
@@ -65,6 +65,9 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 	public final void initialize(double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
 		initialize(UNIT.MM, PROG.ABSOLUTE, initialAirCutHeight, airCutHeight, cutHeight, downSpeed, cutSpeed);
 	}
+	public float getStroke() {
+		return drill.getDiameter(-getCutHeight());
+	}
 	public final void initialize(UNIT unit, PROG prog, double initialAirCutHeight , double airCutHeight, double cutHeight, double downSpeed, double cutSpeed) {
 		initialized = true;
 		this.initialAirCutHeight = initialAirCutHeight;
@@ -73,7 +76,7 @@ public class GCode extends ArrayList<ActionInterface> implements Drawable {
 		this.downSpeed = downSpeed;
 		this.cutSpeed = cutSpeed;
 		
-		double diameter = drill.getDiameter(-cutHeight);
+		double diameter = getStroke();
 		System.out.println("Diameter at Z="+cutHeight+"mm is "+NumberUtil.toGCodeValue(diameter)+"mm(radius "+NumberUtil.toGCodeValue(diameter/2)+"mm)");
 		
 		add(new Comment("Header"));

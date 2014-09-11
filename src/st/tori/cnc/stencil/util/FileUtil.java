@@ -1,23 +1,25 @@
 package st.tori.cnc.stencil.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class FileUtil {
-	
+
 	private static final String RET = "\n";
-	
+
 	public static String readFileAsString(File file) {
 		StringBuffer buf = new StringBuffer();
 		List<String> list = readFileAsStringList(file);
 		Iterator<String> ite = list.iterator();
-		while(ite.hasNext())
+		while (ite.hasNext())
 			buf.append(ite.next()).append(RET);
 		return buf.toString();
 	}
@@ -36,5 +38,16 @@ public class FileUtil {
 			System.out.println(e);
 		}
 		return list;
+	}
+
+	public static void writeFileFromString(File file, String str) {
+		if(file==null||str==null)return;
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(str);
+			bw.close();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
 	}
 }
