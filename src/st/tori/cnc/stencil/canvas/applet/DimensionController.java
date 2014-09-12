@@ -19,7 +19,9 @@ public class DimensionController {
 	private Applet applet;
 	private Graphics graphics;
 	private PositionXYInterface[] xyMinMax;
+	private double xWidth;
 	private double yHeight;
+	
 	private double xMergin;
 	private double yMergin;
 	private double xyWidth;
@@ -34,8 +36,8 @@ public class DimensionController {
 		this.graphics = graphics;
 		this.xyMinMax = xyMinMax;
 		Dimension dimension = applet.getSize();
+		this.xWidth = dimension.getWidth();
 		this.yHeight = dimension.getHeight();
-		double xWidth = dimension.getWidth();
 		double minMergin = Math.min(yHeight, xWidth)*0.1;
 		if(xyMinMax!=null) {
 			this.xyWidth = xyMinMax[1].getX()-xyMinMax[0].getX();
@@ -87,11 +89,23 @@ public class DimensionController {
 		//System.out.println("graphics.fillRect("+getXtoShow(lowerLeftOrigin.getX())+","+getYtoShow(lowerLeftOrigin.getY())+","+getXtoShow(width)+","+getYtoShow(height)+")");
 	}
 	
+	private boolean flipVertical = false;
+	private boolean flipHolizontal = false;
+
+	public void flipVertical() {	flipVertical = !flipVertical;	}
+	public void flipHolizontal() {	flipHolizontal = !flipHolizontal;	}
+	
 	private int getXtoShow(double x) {
-		return (int)(xMergin + (x - xyMinMax[0].getX())*ratio);
+		if(flipHolizontal)
+			return (int)(xWidth - xMergin - (x - xyMinMax[0].getX())*ratio);
+		else
+			return (int)(xMergin + (x - xyMinMax[0].getX())*ratio);
 	}
 	private int getYtoShow(double y) {
-		return (int)(yHeight - yMergin - (y - xyMinMax[0].getY())*ratio);
+		if(flipVertical)
+			return (int)(yMergin + (y - xyMinMax[0].getY())*ratio);
+		else
+			return (int)(yHeight - yMergin - (y - xyMinMax[0].getY())*ratio);
 	}
 	
 	public void _paint(Applet applet, Graphics g) {

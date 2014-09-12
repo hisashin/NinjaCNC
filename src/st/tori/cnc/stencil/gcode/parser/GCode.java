@@ -11,7 +11,6 @@ import st.tori.cnc.stencil.canvas.PositionXYZInterface;
 import st.tori.cnc.stencil.canvas.SimpleXY;
 import st.tori.cnc.stencil.canvas.applet.DimensionController;
 import st.tori.cnc.stencil.canvas.shape.Line;
-import st.tori.cnc.stencil.canvas.shape.Polygon;
 import st.tori.cnc.stencil.canvas.shape.Polyline;
 import st.tori.cnc.stencil.gcode.action.ActionInterface;
 import st.tori.cnc.stencil.gcode.action.Comment;
